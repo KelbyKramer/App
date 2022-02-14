@@ -1,0 +1,182 @@
+body{
+  display:grid;
+  color: green;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 6fr 1fr;
+  grid-template-areas:
+    "header"
+    "nav"
+    "main"
+    "footer"
+}
+header{
+  grid-area: header;
+  text-align: center;
+  width: 100%;
+}
+
+footer{
+  grid-area: footer;
+}
+div#scrollbox{
+  margin:auto;
+  width:80%;
+  background-color: #2a2a72;
+  background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);
+  background-color:green;
+  height:30rem;
+  overflow:scroll;
+  padding:5px;
+  border: 5px solid black;
+
+}
+main{
+  grid-area: main;
+}
+
+ul {
+  display: table;
+  list-style-type: none;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  width:100%;
+
+}
+
+li {
+  display:inline-block;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: #111;
+}
+
+@media(max-width: 800px){
+  body{
+    color: white;
+    background: #ffffff;
+    grid-template-columns: 2fr;
+    grid-template-rows: .5fr .5fr 6fr 1fr;
+    grid-template-areas:
+      "header button"
+      "nav"
+      "main"
+      "footer"
+  }
+  header, nav{
+    background: #0a263b;
+  }
+
+  nav{
+    padding-bottom:25px;
+    width:100%;
+  }
+
+  main{
+    background-color: white;
+  }
+  span#left{
+  }
+  span#center{
+
+  }
+  span#right{
+
+  }
+  div#test{
+    border:3px solid black;
+    display:grid;
+    line-height: 2rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas:
+      "span" "span" "span"
+  }
+  div#test img{
+    height: 50px;
+    width: 50px;
+
+  }
+  div#nav{
+    text-align: center;
+  }
+  .tight{
+    padding: none;
+    color: yellow;
+  }
+
+  input, button#submit{
+    width: 400px;
+    height: 50px;
+    font-size:20px;
+  }
+
+  form{
+    text-align: center;
+  }
+
+  button#logout{
+    font-size: .8em;
+    font-family: 'Oswald', sans-serif;
+    float:right;
+  }
+
+  .formAttributes {
+      margin: auto;
+      width: 60%;
+      padding: 20px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .hideform {
+      display: none;
+  }
+
+  .redeemPromo{
+    z-index: 3;
+    color: black;
+    background-color: gray;
+    position: absolute;
+    top: 50%;
+    left: 25%;
+  }
+
+  div#confirmationForm{
+    z-index: 3;
+    color: black;
+    background-color: gray;
+    position: absolute;
+    top: 40%;
+    left: 25%;
+  }
+
+  div#redeemForm{
+    z-index: 3;
+    color: black;
+    background-color: gray;
+    position: absolute;
+    top: 50%;
+    left: 25%;
+  }
+/*
+  div[id^="closeRedeemPromo"]{
+    z-index: 3;
+    color: black;
+    background-color: gray;
+    position: absolute;
+    top: 50%;
+    left: 25%;
+  }*/
+
+}
