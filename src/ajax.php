@@ -3,9 +3,7 @@ include("functions.php");
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
   if($_POST['func'] == "verifyDateAndLoc"){
-    //echo "Success";
-    //echo $_POST['lat'];
-    //echo $_POST['long'];
+
     date_default_timezone_set('America/Chicago'); // CDT
 
     $current_date = date('Y/m/d');
@@ -15,124 +13,72 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     session_start();
     $where = array("User_ID" => $_SESSION['id'], "event_id" => $_POST['eventID']);
     $result = query("eventbacklog", "*", $where);
-    //var_dump($result);
 
     if ($result->num_rows > 0) {
-      $error = True;
+      echo "This promo already exists in the backlog";
     }
-    //time check
-    $sql = "SELECT events.*, locations.latLong FROM events INNER JOIN locations ON events.Loc_ID=locations.Loc_ID WHERE events.Event_ID=".$_POST['eventID'];
-    $conn = dbConnect();
-    $result = mysqli_query($conn, $sql);
-    //$arr = array("event_ID" => $_POST['eventID']);
-    //$result = query("events", "*", $arr);
+    else{
+      $result = innerJoinQuery("events", "locations", "events.*", "locations.latLong", "events.Loc_ID=locations.Loc_ID", "events.Event_ID=".$_POST['eventID']);
 
-    if ($result->num_rows > 0) {
-      while($row = $result->fetch_assoc()) {
-        //var_dump($row);
-        $start = $row['start'];
-        $finish = $row['finish'];
-        $date = $row['date'];
-        $reward = $row['tokens'];
-        $coords = $row['latLong'];
+      if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+          //var_dump($row);
+          $start = $row['start'];
+          $finish = $row['finish'];
+          $date = $row['date'];
+          $reward = $row['tokens'];
+          $coords = $row['latLong'];
+        }
+      }
+
+      $event_coords = explode(",", $coords);
+      $user_coordinates = explode(" ", $_POST['coordinates']);
+      $Loc_error = coordinateCheck($event_coords, $user_coordinates);
+
+      if($Loc_error == True){
+        echo "Not in location area";
+      }
+      else{
+        echo "In location area";
+      }
+      $time_Error = False;
+      $date_Error = False;
+      //$time_Error = timeCheck($start, $finish, $current_time);
+      //$date_Error = dateCheck($date, $current_date);
+
+      if ($Loc_error || $time_Error || $date_Error){
+        echo "There was an error";
+        if($Loc_error){
+          echo "You are not in the location radius";
+        }
+
+        if($time_Error){
+          echo "You are not within the specified time for this event";
+        }
+
+        if($date_Error){
+          echo "You are not within the specified date for this event";
+        }
+      }
+      else{
+        //not an error, do token redemption
+        $tokens = $_SESSION['tokens'];
+        $newTokens = $tokens + $reward;
+        $newTotalTokens = 0;
+        $conn = dbConnect();
+        $result = updateQuery("users", "current_tokens=".$newTokens, "User_ID=".$_SESSION['id']);
+
+        $_SESSION['tokens'] = $newTokens;
+
+        $user_id = $_SESSION['id'];
+        $event_id = $_POST['eventID'];
+        $sql = "INSERT INTO eventbacklog (User_ID, event_ID) VALUES (?, ?)";
+        insertQuery($sql, $user_id, $event_id);
+
+        echo "Great success!";
       }
     }
-    //TODO: Refactor this into a function
-
-    $event_coords = explode(",", $coords);
-    $topLeftLat = floatval($event_coords[0]);
-    $topLeftLong = floatval($event_coords[1]);
-    $botRightLat = floatval($event_coords[2]);
-    $botRightLong = floatval($event_coords[3]);
-    $user_coordinates = explode(" ", $_POST['coordinates']);
-    $user_latitude = floatval($user_coordinates[0]);
-    $user_longitude = floatval($user_coordinates[1]);
-    //echo $coords;
-    echo " user lat ".$user_latitude;
-    echo " user long ".$user_longitude;
-
-    echo " TL Lat ".$topLeftLat;
-    echo " TL Long ".$topLeftLong;
-    echo " BR Lat ".$botRightLat;
-    echo " BR Long ".$botRightLong;
-
-    //Do compare right here
-    $Loc_error = False;
-    if($topLeftLat < $user_latitude){
-      $Loc_error = True;
-    }
-
-    if($botRightLat > $user_latitude){
-      $Loc_error = True;
-    }
-
-    if($topLeftLong > $user_longitude){
-      $Loc_error = True;
-    }
-
-    if($botRightLong < $user_longitude){
-      $Loc_error = True;
-    }
-
-    if($Loc_error == True){
-      echo "Not in location area";
-    }
-    else{
-      echo "In location area";
-    }
-  /*
-    if ($date != $current_date){
-      $error = True;
-    }
-    //before event
-    if($start > $current_time){
-      $error = True;
-    }
-
-    //after event
-    if ($finish < $current_time){
-      $error = True;
-    }*/
-    /*
-    echo $current_date;
-    echo $current_time;
-    echo $start;
-    echo $finish;
-    echo $error;
-    */
-    if ($error || $Loc_error){
-      echo "There was an error";
-      //TODO: return custom warnings based on error
-    }
-    else{
-      //not an error, do token redemption
-      $tokens = $_SESSION['tokens'];
-      $newTokens = $tokens + $reward;
-      $newTotalTokens = 0;
-      $conn = dbConnect();
-      $sql = "UPDATE users SET current_tokens=".$newTokens." WHERE User_ID=".$_SESSION['id'];
-      echo $sql;
-      $result = mysqli_query($conn, $sql);
-      $_SESSION['tokens'] = $newTokens;
-
-      //$sql = "INSERT INTO eventbacklog ('User_ID', 'event_ID') VALUES ("., 1)";
-
-      $user_id = $_SESSION['id'];
-      $event_id = $_POST['eventID'];
-
-      //$con = new mysqli($user, $pass, $db);
-      $stmt = $conn->prepare("INSERT INTO eventbacklog (User_ID, event_ID) VALUES (?, ?)");
-      $stmt->bind_param("ss", $user_id , $event_id);
-      $stmt->execute();
-      //token redemption and updating db
-
-      //backlog append
-      echo "Great success!";
-    }
-
-
-
-
+    //time check
 
   }
   else if ($_POST['func'] == "loadHome"){
@@ -206,19 +152,15 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     echo $html;
   }
   else if($_POST['func'] == "displayPurchasePromos"){
-    $conn = dbConnect();
-    $sql2 = "SELECT promos.promo_ID, promos.cost, promos.Title, promolinks.redeem_code, promolinks.business_name FROM promos INNER JOIN promolinks ON promos.business_id=promolinks.business_id";
-    $result2 = $conn->query($sql2);
-
-    $arr2 = generateEventArray($result2);
-    $html2 = generatePromoHTML($arr2);
-    echo $html2;
+    $result = innerJoinQuery("promos", "promolinks", "promos.promo_ID, promos.cost, promos.Title, promolinks.redeem_code, promolinks.business_name", "", "promos.business_id=promolinks.business_id");
+    $arr = generateEventArray($result);
+    $html = generatePromoHTML($arr);
+    echo $html;
   }
   else if($_POST['func'] == "displayEvents"){
 
     $conn = dbConnect();
-    $sql = "SELECT events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong FROM events INNER JOIN locations ON events.Loc_ID=locations.Loc_ID";
-    $result = $conn->query($sql);
+    $result = innerJoinQuery("events", "locations", "events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong", "", "events.Loc_ID=locations.Loc_ID");
 
     $arr = generateEventArray($result);
     $html =  generateHTML($arr);
@@ -230,10 +172,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     session_start();
     $where = array("User_ID" => $_SESSION['id']);
     $result2 = query("userpromos", "Promo_ID", $where);
-    //$sql2 = "SELECT Promo_ID FROM userpromos WHERE User_ID=".$_SESSION['id'];
+
     $ret = array();
-    //$result2 = $conn->query($sql2);
-    //var_dump($result2);
+
     if ($result2->num_rows > 0) {
       while($row = $result2->fetch_assoc()) {
         array_push($ret, $row['Promo_ID']);
@@ -246,7 +187,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $ret = array();
     if ($final) {
       while($row = $final->fetch_assoc()) {
-        //var_dump($row);
         array_push($ret, $row);
       }
       $html3= generateRedeemPromoHTML($ret);
@@ -263,30 +203,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     session_start();
     //Check if user has the promo in userpromos purchased based on promo ID
     $result = query("userpromos", "*", array("User_ID" => $_SESSION['id'], "Promo_ID" => $id));
-    //var_dump($result);
 
     if($result->num_rows == 0){
-      //error, user doesn't have promo
       echo "You don't actually have this promo legitimately purchased";
     }
     else{
-      //have the promo
-      $sql = "SELECT promolinks.redeem_code FROM promos INNER JOIN promolinks ON promos.business_id = promolinks.business_id WHERE promos.promo_ID=".$id;
-
-      $conn = dbConnect();
-      $result = mysqli_query($conn, $sql);
-      //$arr = array("event_ID" => $_POST['eventID']);
-      //$result = query("events", "*", $arr);
+      $result = innerJoinQuery("promos", "promolinks", "promolinks.redeem_code", "", "promos.business_id = promolinks.business_id", "promos.promo_ID=".$id);
 
       if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-          //var_dump($row);
           $dbCode = $row['redeem_code'];
         }
       }
-
-      //echo $dbCode;
-
 
       if($dbCode != $code){
         //error, code was entered wrong
@@ -294,21 +222,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       }
       else{
         echo "Success";
-
-        $sql = "DELETE FROM userpromos WHERE User_ID=".$_SESSION['id']." AND Promo_ID=".$id;
-        $result = mysqli_query($conn, $sql);
+        deleteQuery("userpromos", "User_ID=".$_SESSION['id']." AND Promo_ID=".$id);
       }
     }
-
-    //After, delete promo from userpromos
-
-    //return confirmation message
-
   }
 }
 else{
   header("Location: ../restrict.php");
 }
-
 
  ?>

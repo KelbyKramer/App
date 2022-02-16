@@ -1,8 +1,6 @@
 <?php
-
 include("dbDefine.php");
-//include("src/phpqrcode/qrlib.php");
-
+//TODO: Test this function
 function query($table, $columns, $where, $endText = "") {
   $db = dbConnect();
   $sql = "";
@@ -24,7 +22,106 @@ function query($table, $columns, $where, $endText = "") {
   //closeDB($db);
   return $result;
 }
+//TODO: Test this function
+function innerJoinQuery($table1, $table2, $fields1, $fields2, $on, $where = ""){
+  $db = dbConnect();
+  $ret = "SELECT ";
+  $ret .= $fields1;
+  if($fields2 != ""){
+    $ret .= ", ".$fields2;
+  }
 
+  $ret .= " FROM ";
+  $ret .= $table1." INNER JOIN ".$table2." ON ";
+  $ret.= $on;
+  if ($where != ""){
+    $ret .= " WHERE ".$where;
+  }
+  $result = mysqli_query($db, $ret);
+  //closeDB($db);
+  return $result;
+
+}
+//TODO: Test this function
+function insertQuery($statement, $value1, $value2){
+  $conn = dbConnect();
+  $stmt = $conn->prepare($statement);
+  $stmt->bind_param("ss", $value1 , $value2);
+  $stmt->execute();
+}
+//TODO: Test this function
+function updateQuery($table, $set, $where=""){
+  $db = dbConnect();
+  $ret = "UPDATE ";
+  $ret .= $table;
+  $ret .= " SET ".$set;
+  if($where != ""){
+    $ret .= " WHERE ".$where;
+  }
+  $ret .= "";
+
+  $result = mysqli_query($db, $ret);
+  //closeDB($db);
+  return $result;
+
+}
+//TODO: Test this function
+function deleteQuery($table, $where){
+  $db = dbConnect();
+  $ret = "DELETE FROM ";
+  $ret .= $table." ";
+  if ($where != ""){
+    $ret .= "WHERE ".$where;
+  }
+  $ret .= "";
+  $result = mysqli_query($db, $ret);
+
+  return $result;
+}
+
+function dateCheck($date, $current_date){
+  if ($date != $current_date){
+    return True;
+  }
+  return False;
+}
+
+function timeCheck($start, $finish, $current_time){
+  if($start > $current_time || $finish < $current_time){
+    return True;
+  }
+  return False;
+}
+//TODO: Test this function
+function coordinateCheck($event_coords, $user_coordinates){
+  $topLeftLat = floatval($event_coords[0]);
+  $topLeftLong = floatval($event_coords[1]);
+  $botRightLat = floatval($event_coords[2]);
+  $botRightLong = floatval($event_coords[3]);
+
+  $user_latitude = floatval($user_coordinates[0]);
+  $user_longitude = floatval($user_coordinates[1]);
+
+  $Loc_error = False;
+  if($topLeftLat < $user_latitude){
+    $Loc_error = True;
+  }
+
+  if($botRightLat > $user_latitude){
+    $Loc_error = True;
+  }
+
+  if($topLeftLong > $user_longitude){
+    $Loc_error = True;
+  }
+
+  if($botRightLong < $user_longitude){
+    $Loc_error = True;
+  }
+
+  return $Loc_error;
+}
+//TODO: Test this function
 function queryUserPromos($sql, $where, $endText = "") {
   $db = dbConnect();
   $sql .= '(';
@@ -56,7 +153,7 @@ function queryUserPromos($sql, $where, $endText = "") {
   return $result;
 }
 
-
+//TODO: Test this function
 function login($username, $password){
   $conn = dbConnect();
   $sanitized_username = mysqli_real_escape_string($conn, $username);
@@ -89,7 +186,7 @@ function login($username, $password){
     echo "<center>Credentials were not successful</center>";
   }
 }
-
+//TODO: Test this function
 function convertDate($date){
   $newDate = date('F j, Y',strtotime($date));
   return $newDate;
@@ -99,7 +196,7 @@ function convertTime($time){
   $newTime = date("g:i a", strtotime($time));
   return $newTime;
 }
-
+//TODO: Test this function
 function generatePromoHTML($arr){
   $ret = "";
   /*$ret .= "<div id='confirmationForm' class='formAttributes hideform'>";
@@ -128,11 +225,11 @@ function generatePromoHTML($arr){
   }
   return $ret;
 }
-
+//TODO: Test this function
 function generateQRCode($title, $business_id){
   return $title. $business_id;
 }
-
+//TODO: Test this function
 function generateRedeemPromoHTML($arr){
   $ret = "";
   //TODO: Include redeem promo div in here
@@ -166,7 +263,7 @@ function generateRedeemPromoHTML($arr){
   }
   return $ret;
 }
-
+//TODO: Test this function
 function generateHTML($arr){
   $ret = "";
   foreach($arr as $event){
@@ -193,7 +290,7 @@ function generateHTML($arr){
   }
   return $ret;
 }
-
+//TODO: Test this function
 function generateEventArray($result){
   $ret = array();
   if ($result->num_rows > 0) {
@@ -204,6 +301,8 @@ function generateEventArray($result){
   return $ret;
 }
 
+
+//TODO: Test this function
 function registerUser($username, $password, $email){
   $conn = dbConnect();
   $sanitized_username = mysqli_real_escape_string($conn, $username);
