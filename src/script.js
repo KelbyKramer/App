@@ -47,6 +47,7 @@ function displayMyPromos(){
 }
 
 function redeemPromo(id){
+  /*
   console.log("Promo is ready to be redeemed" + id);
   var code = $('#redeem_code').val();
 
@@ -63,7 +64,7 @@ function redeemPromo(id){
     console.log(data);
     $('#redeemForm').html(data);
   }
-});
+});*/
 }
 
 function displayRedeemPromo(id){

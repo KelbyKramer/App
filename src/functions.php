@@ -159,9 +159,15 @@ function login($username, $password){
   $sanitized_username = mysqli_real_escape_string($conn, $username);
   $sanitized_password = mysqli_real_escape_string($conn, $password);
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
-  $sql = "SELECT User_ID, Password, current_tokens FROM Users WHERE Username='$sanitized_username'";
+  $sql = "SELECT User_ID, Password, current_tokens, verify FROM Users WHERE Username='$sanitized_username'";
 
-  $result = mysqli_query($conn, $sql);
+  $stmt = $conn->prepare('SELECT User_ID, Password, current_tokens, verify FROM Users WHERE Username= ?');
+  $stmt->bind_param('s', $sanitized_username); // 's' specifies the variable type => 'string'
+
+  $stmt->execute();
+
+  $result = $stmt->get_result();
+  //$result = mysqli_query($conn, $sql);
   if ($result->num_rows > 0) {
     //login credentials were successful
 
@@ -169,12 +175,20 @@ function login($username, $password){
       $hashFromDatabase = $row['Password'];
       $id = $row['User_ID'];
       $tokens = $row['current_tokens'];
+      $verify = $row['verify'];
+    }
+    $error = False;
+    if($verify == 0){
+      echo "Account has not yet been verified";
+      $error = True;
     }
 
     if(!password_verify($password, $hashFromDatabase)){
       echo "Password is invalid";
+      $error = True;
     }
-    else{
+
+    if($error == False){
       session_start();
       $_SESSION['id'] = $id;
       $_SESSION['tokens'] = $tokens;
@@ -239,10 +253,10 @@ function generateRedeemPromoHTML($arr){
     $ret .= "<div>Redeem this promo From the backend</div>";
     $ret .= "<div>".$promo['business_name']."</div>";
     $ret .= "<div>".$promo['Title']."</div>";
-    $qr = generateQRCode($promo['Title'], $promo['business_id']);
-    $ret .= "<img src='src/qrCodes/".$qr.".png'></img>";
-    $ret .= "<input id='redeem_code' style='width:80%;'></input>";
-    $ret .= "<button id='redeem' onclick='redeemPromo(".$promo['Promo_ID'].")' style='float: right; color: green;'>Validate Promo</button>";
+    //$qr = generateQRCode($promo['Title'], $promo['business_id']);
+    //$ret .= "<img src='src/qrCodes/".$qr.".png'></img>";
+    //$ret .= "<input id='redeem_code' style='width:80%;'></input>";
+    $ret .= "<button id='redeem' style='float: right; color: green;'><a href='redeemPromo.php?id=".$_SESSION['id']."&promo_id=".$promo['Promo_ID']."'>Validate Promo</a></button>";
     $ret .= "</div>";
     $ret .= "<div id='".$promo['Promo_ID']."'>";
     $ret .= "<div id='test'>";
@@ -270,7 +284,7 @@ function generateHTML($arr){
     $ret .= "<div id='event ".$event['Event_ID']."'>";
     $ret .= "<div id='test'>";
     $ret .= "<span>";
-    $ret .= "<img src='src/main_logo.svg'></img>";
+    $ret .= "<img src='src/MavLogo.png'></img>";
     $ret .= "<div>".$event['type']."</div>";
     $ret .= "</span>";
     $ret .= "<span>";

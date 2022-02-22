@@ -83,25 +83,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   }
   else if ($_POST['func'] == "loadHome"){
     //Events information
-    $conn = dbConnect();
-    $sql = "SELECT events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong FROM events INNER JOIN locations ON events.Loc_ID=locations.Loc_ID";
-    $result = $conn->query($sql);
-
-    $arr = generateEventArray($result);
-    $html =  generateHTML($arr);
-    //events html
-    echo $html;
-    //Promos information
-    $sql2 = "SELECT promos.promo_ID, promos.cost, promos.Title, promolinks.redeem_code, promolinks.business_name FROM promos INNER JOIN promolinks ON promos.business_id=promolinks.business_id";
-    $result2 = $conn->query($sql2);
-
-    $arr2 = generateEventArray($result2);
-    $html2 = generatePromoHTML($arr2);
-    echo $html2;
-
-    //User promos information
-    $sql3 = "";
-    //Leaderboard information
 
   }
   else if($_POST['func'] == "purchasePromo"){
@@ -152,7 +133,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     echo $html;
   }
   else if($_POST['func'] == "displayPurchasePromos"){
-    $result = innerJoinQuery("promos", "promolinks", "promos.promo_ID, promos.cost, promos.Title, promolinks.redeem_code, promolinks.business_name", "", "promos.business_id=promolinks.business_id");
+    $result = innerJoinQuery("promos", "promolinks", "promos.promo_ID, promos.cost, promos.Title, promolinks.business_name", "", "promos.business_id=promolinks.business_id");
     $arr = generateEventArray($result);
     $html = generatePromoHTML($arr);
     echo $html;
@@ -181,7 +162,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       }
     }
 
-    $sql = "SELECT promos.Promo_ID, promos.Title, promos.business_id, promolinks.redeem_code, promolinks.business_name FROM promos INNER JOIN promolinks ON promos.business_id=promolinks.business_id WHERE";
+    $sql = "SELECT promos.Promo_ID, promos.Title, promos.business_id, promolinks.business_name FROM promos INNER JOIN promolinks ON promos.business_id=promolinks.business_id WHERE";
     $final = queryUserPromos($sql, $ret);
 
     $ret = array();
@@ -194,36 +175,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     }
     else{
       echo "You haven't purchased any promos";
-    }
-  }
-  else if($_POST['func'] == "redeemPromo"){
-    $code = $_POST['redeem_code'];
-    $id = $_POST['promo_id'];
-
-    session_start();
-    //Check if user has the promo in userpromos purchased based on promo ID
-    $result = query("userpromos", "*", array("User_ID" => $_SESSION['id'], "Promo_ID" => $id));
-
-    if($result->num_rows == 0){
-      echo "You don't actually have this promo legitimately purchased";
-    }
-    else{
-      $result = innerJoinQuery("promos", "promolinks", "promolinks.redeem_code", "", "promos.business_id = promolinks.business_id", "promos.promo_ID=".$id);
-
-      if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-          $dbCode = $row['redeem_code'];
-        }
-      }
-
-      if($dbCode != $code){
-        //error, code was entered wrong
-        echo "wrong code was entered";
-      }
-      else{
-        echo "Success";
-        deleteQuery("userpromos", "User_ID=".$_SESSION['id']." AND Promo_ID=".$id);
-      }
     }
   }
 }
