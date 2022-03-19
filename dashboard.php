@@ -1,7 +1,17 @@
 <?php
 include("src/functions.php");
+include("header.php");
+
 
 session_start();
+
+if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === "off") {
+    $location = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: ' . $location);
+    exit;
+}
+
 $id = $_GET['id'];
 if($id != $_SESSION['id']){
   header("Location:restrict.php");
@@ -22,7 +32,7 @@ if($id != $_SESSION['id']){
  <body>
    <header>
      <h1>Maverick Rewards</h1>
-     <button id="logout"><a href="logout.php">Logout</a></button>
+     <button id="logout" style='background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);' ><a style='text-decoration:none; color:black;' href="logout.php">Logout</a></button>
      <div>Tokens: <?php echo $_SESSION['tokens']; ?></div>
    </header>
    <nav>
@@ -44,17 +54,21 @@ if($id != $_SESSION['id']){
         <button id='close' style='float: right; color: green;'>No</button>
     </div>
 
+    <div id='eventMessage' class='formAttributes hideform'>
+      Here is a test of data
+    </div>
+
     <div id='redeemForm' class='formAttributes hideform'>
       <div>This is a test div</div>
    </div>
      <div>Events coming up</div>
-
+<!--
      <label for="sort">Sort Events By:</label>
       <select name="sort" id="sort">
        <option value="sport">Sport</option>
        <option value="date">Date</option>
        <option value="amount">Reward Amount</option>
-      </select>
+     </select>-->
      <div id="scrollbox">
      </div>
    </main>
@@ -99,6 +113,15 @@ document.addEventListener('mouseup', function(e) {
     //var container = document.querySelector([id^="redeemPromo"]).id;
     var close = document.getElementById('closeRedeemPromo');
     if (!container.contains(e.target) || close.contains(e.target)) {
+        container.style.display = 'none';
+    }
+});
+
+document.addEventListener('mouseup', function(e) {
+    var container = document.getElementById('eventMessage');
+    //var container = document.querySelector([id^="redeemPromo"]).id;
+    //var close = document.getElementById('closeRedeemPromo');
+    if (!container.contains(e.target)) {
         container.style.display = 'none';
     }
 });

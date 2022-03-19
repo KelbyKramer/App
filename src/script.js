@@ -81,7 +81,7 @@ function displayLeaderboard(){
   $('#scrollbox').html(
       $('<div>').prop({
           id: 'innerdiv',
-          innerHTML: 'This is the global token Leaderboard',
+          innerHTML: 'This feature has not been implemented yet',
           className: 'border pad'
       })
   );
@@ -106,14 +106,14 @@ function ajax(event_id){
         eventID: event_id
       },
       success: function(data){
-        //console.log(data);
-        if(data == "There was an error"){
-          alert("You can't redeem this game");
-        }
 
         if(data == "Great success!"){
-          alert("Your tokens have been redeemed");
+          displayEventMessage("Success!  Your tokens have been redeemed");
         }
+        else{
+            displayEventMessage(data);
+        }
+
         console.log(data);
       }
       });
@@ -135,6 +135,11 @@ function getGeoLocation(){
 function showPosition(position) {
   var coords = "<p id='coords'>" + position.coords.latitude + " " + position.coords.longitude + "</p>";
   $("body").append(coords);
+}
+
+function displayEventMessage(message){
+  $('#eventMessage').html(message);
+  $('#eventMessage').show();
 }
 
 function purchasePromo(button_id){

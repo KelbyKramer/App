@@ -9,6 +9,29 @@ if(isset($_POST) && count($_POST) == 2){
   login($username, $password);
 }
 
+/*
+$servername = "localhost";
+$username = "scrudu50_root";
+$password = "+byia,hZ]-}y";
+$dbname = "scrudu50_app";
+*/
+// Create connection
+/*
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  echo "Connection failed";
+}
+else{
+  echo "Connection success";
+}
+
+
+$conn = dbConnect();
+$sql = "SELECT * FROM locations";
+
+$result = mysqli_query($conn, $sql);
+var_dump($result);*/
  ?>
 
  <head>
@@ -51,6 +74,7 @@ if(isset($_POST) && count($_POST) == 2){
 </html>
 
 <script>
+
 $( document ).ready(function() {
     $('#how').attr('class', 'visible');
     $('#1').toggleClass('hidden visible');

@@ -6,6 +6,11 @@ function dbConnect(){
   $password = "";
   $dbname = "app";
 
+  /*$servername = "localhost";
+  $username = "scrudu50_root";
+  $password = "+byia,hZ]-}y";
+  $dbname = "scrudu50_app";*/
+
   // Create connection
   $conn = new mysqli($servername, $username, $password, $dbname);
   // Check connection

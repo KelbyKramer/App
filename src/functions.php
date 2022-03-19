@@ -23,7 +23,7 @@ function query($table, $columns, $where, $endText = "") {
   return $result;
 }
 //TODO: Test this function
-function innerJoinQuery($table1, $table2, $fields1, $fields2, $on, $where = ""){
+function innerJoinQuery($table1, $table2, $fields1, $fields2, $on, $where = "", $order_by=""){
   $db = dbConnect();
   $ret = "SELECT ";
   $ret .= $fields1;
@@ -37,10 +37,14 @@ function innerJoinQuery($table1, $table2, $fields1, $fields2, $on, $where = ""){
   if ($where != ""){
     $ret .= " WHERE ".$where;
   }
+
+  if($order_by != ""){
+    $ret .= " ORDER BY ".$order_by;
+  }
+  //return $ret;
   $result = mysqli_query($db, $ret);
   //closeDB($db);
   return $result;
-
 }
 //TODO: Test this function
 function insertQuery($statement, $value1, $value2){
@@ -159,9 +163,9 @@ function login($username, $password){
   $sanitized_username = mysqli_real_escape_string($conn, $username);
   $sanitized_password = mysqli_real_escape_string($conn, $password);
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
-  $sql = "SELECT User_ID, Password, current_tokens, verify FROM Users WHERE Username='$sanitized_username'";
+  $sql = "SELECT User_ID, Password, current_tokens, verify FROM users WHERE Username='$sanitized_username'";
 
-  $stmt = $conn->prepare('SELECT User_ID, Password, current_tokens, verify FROM Users WHERE Username= ?');
+  $stmt = $conn->prepare('SELECT User_ID, Password, current_tokens, verify FROM users WHERE Username= ?');
   $stmt->bind_param('s', $sanitized_username); // 's' specifies the variable type => 'string'
 
   $stmt->execute();
@@ -250,14 +254,12 @@ function generateRedeemPromoHTML($arr){
   foreach($arr as $promo){
     $ret .= "<div id='redeemPromo".$promo['Promo_ID']."' class='formAttributes hideform'>";
     $ret .= "<button id='closeRedeemPromo' onclick='closeRedeemPromo()' style='float: right; color: red;'>X</button>";
-    $ret .= "<div>Redeem this promo From the backend</div>";
     $ret .= "<div>".$promo['business_name']."</div>";
     $ret .= "<div>".$promo['Title']."</div>";
-    //$qr = generateQRCode($promo['Title'], $promo['business_id']);
-    //$ret .= "<img src='src/qrCodes/".$qr.".png'></img>";
-    //$ret .= "<input id='redeem_code' style='width:80%;'></input>";
-    $ret .= "<button id='redeem' style='float: right; color: green;'><a href='redeemPromo.php?id=".$_SESSION['id']."&promo_id=".$promo['Promo_ID']."'>Validate Promo</a></button>";
+    $ret .= "<div>Press this button to go to the redeem promo page</div>";
+    $ret .= "<button id='redeem' style='float: left; font-size: 2 rem; background-color: #19f316;'><a style='text-decoration:none' href='redeemPromo.php?id=".$_SESSION['id']."&promo_id=".$promo['Promo_ID']."'>Validate Promo</a></button>";
     $ret .= "</div>";
+
     $ret .= "<div id='".$promo['Promo_ID']."'>";
     $ret .= "<div id='test'>";
     $ret .= "<span>";
@@ -323,9 +325,10 @@ function registerUser($username, $password, $email){
   $sanitized_password = mysqli_real_escape_string($conn, $password);
   $sanitized_email = mysqli_real_escape_string($conn, $email);
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
-  $sql = "INSERT INTO Users (Username, Password, email) VALUES ('$sanitized_username', '$hashed_password', '$sanitized_email')";
-
-  $result = mysqli_query($conn, $sql);;
+  $sql = "INSERT INTO users (Username, Password, email) VALUES ('$sanitized_username', '$hashed_password', '$sanitized_email')";
+  //$sql = "DELETE FROM users WHERE Username='Kelby'";
+  echo "Hello register the user please";
+  $result = mysqli_query($conn, $sql);
   $_POST = array();
 }
  ?>

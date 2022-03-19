@@ -208,6 +208,15 @@ li a:hover {
     left: 25%;
   }
 
+  div#eventMessage{
+    z-index: 3;
+    color: black;
+    background-color: gray;
+    position: absolute;
+    top: 40%;
+    left: 25%;
+  }
+  
   div#redeemForm{
     z-index: 3;
     color: black;

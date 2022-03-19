@@ -35,29 +35,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       $user_coordinates = explode(" ", $_POST['coordinates']);
       $Loc_error = coordinateCheck($event_coords, $user_coordinates);
 
-      if($Loc_error == True){
-        echo "Not in location area";
-      }
-      else{
-        echo "In location area";
-      }
       $time_Error = False;
       $date_Error = False;
-      //$time_Error = timeCheck($start, $finish, $current_time);
-      //$date_Error = dateCheck($date, $current_date);
+      $time_Error = timeCheck($start, $finish, $current_time);
+      $date_Error = dateCheck($date, $current_date);
 
       if ($Loc_error || $time_Error || $date_Error){
-        echo "There was an error";
+        echo "<div style='border:1px solid black;'>There was an error</div>";
         if($Loc_error){
-          echo "You are not in the location radius";
+          echo "<div style='border:1px solid black;'>You are not in the location radius</div>";
         }
 
         if($time_Error){
-          echo "You are not within the specified time for this event";
+          echo "<div style='border:1px solid black;'>You are not within the specified time for this event</div>";
         }
 
         if($date_Error){
-          echo "You are not within the specified date for this event";
+          echo "<div style='border:1px solid black;'>You are not within the specified date for this event</div>";
         }
       }
       else{
@@ -92,7 +86,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $tokens = $_SESSION['tokens'];
 
     $conn = dbConnect();
-    $sql = "SELECT cost FROM Promos WHERE Promo_ID=".$promo_id;
+    $sql = "SELECT cost FROM promos WHERE promo_ID=".$promo_id;
     $sanitized_sql = mysqli_real_escape_string($conn, $sql);
     $result = mysqli_query($conn, $sql);
     if ($result->num_rows > 0) {
@@ -102,6 +96,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     }
     else{
       echo "<center>This Promo does not exist</center>";
+      //TODO: Figure out a better way to handle this
+
+      //$cost = 3000000;
     }
 
     $sql = "SELECT * FROM userpromos WHERE User_ID=".$id." AND Promo_ID=".$promo_id;
@@ -134,6 +131,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   }
   else if($_POST['func'] == "displayPurchasePromos"){
     $result = innerJoinQuery("promos", "promolinks", "promos.promo_ID, promos.cost, promos.Title, promolinks.business_name", "", "promos.business_id=promolinks.business_id");
+
     $arr = generateEventArray($result);
     $html = generatePromoHTML($arr);
     echo $html;
@@ -141,8 +139,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   else if($_POST['func'] == "displayEvents"){
 
     $conn = dbConnect();
-    $result = innerJoinQuery("events", "locations", "events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong", "", "events.Loc_ID=locations.Loc_ID");
-
+    $result = innerJoinQuery("events", "locations", "events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong", "", "events.Loc_ID=locations.Loc_ID", "", "events.date, events.start");
+    //echo $result;
     $arr = generateEventArray($result);
     $html =  generateHTML($arr);
     echo $html;

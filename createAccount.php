@@ -36,8 +36,8 @@ if(isset($_POST) && count($_POST) > 0){
   $password = $_POST['password'];
   $email = $_POST['email'];
   //TODO: This query is unsafe
-  //$sql = "SELECT * FROM Users WHERE Username='$username'";
-  $result = query("Users", "*", array('Username' => $username));
+  //$sql = "SELECT * FROM users WHERE Username='$username'";
+  $result = query("users", "*", array('Username' => $username));
 
   //$result = $conn->query($sql);
   if ($result->num_rows > 0) {
@@ -46,7 +46,7 @@ if(isset($_POST) && count($_POST) > 0){
     $errorCount++;
   }
 
-  $result = query("Users", "*", array('Email' => $email));
+  $result = query("users", "*", array('Email' => $email));
 
   if ($result->num_rows > 0) {
     //username is taken
