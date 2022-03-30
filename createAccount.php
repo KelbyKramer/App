@@ -57,10 +57,12 @@ if(isset($_POST) && count($_POST) > 0){
   if($errorCount == 0){
     //register the user and log them in
     echo "An email has been sent, click the link to confirm your registration";
-    //TODO: Create field in user table that is boolean if their account is verified
-    //or not and check upon login if they are verified
-    registerUser($username, $password, $email);
-    login($username, $password);
+    //generate 12 character string to put into database and send in mail link
+    $str = generateRandomString();
+    echo $str;
+    generateRegisterEmail("kramerkelby@gmail.com", $str);
+    registerUser($username, $password, $email, $str);
+    //login($username, $password);
   }
   else{
     //Display error message
@@ -76,12 +78,43 @@ if(isset($_POST) && count($_POST) > 0){
  <meta name="viewport" content="width=device-width, initial-scale=1"/>
  <link rel="stylesheet" href="style.css">
 
+ <head>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <script src="src/script.js"></script>
+ </head>
+
   <form method='post' action=''>
     <input id="field" name='userName' type="text" placeholder='Username' autocomplete='off'/>
     <input id="email" name='email' type="text" placeholder='E-mail (Use your @mnsu.edu email)' autocomplete='off'/>
     <input id="password" name='password' type="password" placeholder='Password (Must be at least 6 characters)' autocomplete='off'/>
     <input id="re-password" name='re-password' type="password" placeholder='Re-Enter Password' autocomplete='off'/>
+    <input style='display:none;' id="age" name='age' type="text" placeholder='Age (Optional)' autocomplete='off'/>
+    <input style='display:none;' id="major" name='major' type="text" placeholder='Current Major (Optional)' autocomplete='off'/>
+    <input style='display:none;' id="living" name='living' type="text" placeholder='Living Accomodations (Optional)' autocomplete='off'/>
     <button id="submit" type="submit">Create Account</button>
   </form>
+  <button id="expand" onclick="showExtraFields();">Want 100 free tokens?  Click here to provide more information</button>
 
  </html>
+
+ <script>
+ function showExtraFields(){
+
+   if($('#age:visible').length == 0){
+     $('#age').show();
+     $('#major').show();
+     $('#living').show();
+     $('#expand').html("Hide extra fields");
+   }
+   else{
+     $('#age').hide();
+     $('#major').hide();
+     $('#living').hide();
+     $('#expand').html("Show extra fields");
+   }
+
+
+ }
+
+
+ </script>

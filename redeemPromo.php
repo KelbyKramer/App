@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <form method='post' action='' id='form'>
   <img src='src/FreeBreakfast.png'></img>
   <div id='div' style='text-align: center;'>NOTE: Clicking the button will redeem the promo.  Make sure an employee is present.</div>
-  <button id='button' style='position: absolute; height: 100px; width:200px; left: 20%;background-color: #2a2a72; background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);' type="submit" id="submit" onclick='redirect()'>Redeem this Promo</button>
+  <button id='button' style='position: absolute; height: 100px; width:200px; left: 50%;background-color: #2a2a72; background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);' type="submit" id="submit" onclick='redirect()'>Redeem this Promo</button>
 </form>
 </html>
 

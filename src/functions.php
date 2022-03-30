@@ -1,5 +1,6 @@
 <?php
 include("dbDefine.php");
+include("config.php");
 //TODO: Test this function
 function query($table, $columns, $where, $endText = "") {
   $db = dbConnect();
@@ -47,10 +48,12 @@ function innerJoinQuery($table1, $table2, $fields1, $fields2, $on, $where = "", 
   return $result;
 }
 //TODO: Test this function
-function insertQuery($statement, $value1, $value2){
+//TODO: make this function agnostic to number of arguments passed in
+
+function insertQuery($statement, $value1, $value2, $value3){
   $conn = dbConnect();
   $stmt = $conn->prepare($statement);
-  $stmt->bind_param("ss", $value1 , $value2);
+  $stmt->bind_param("sss", $value1 , $value2, $value3);
   $stmt->execute();
 }
 //TODO: Test this function
@@ -63,7 +66,7 @@ function updateQuery($table, $set, $where=""){
     $ret .= " WHERE ".$where;
   }
   $ret .= "";
-
+  echo $ret;
   $result = mysqli_query($db, $ret);
   //closeDB($db);
   return $result;
@@ -96,6 +99,79 @@ function timeCheck($start, $finish, $current_time){
   }
   return False;
 }
+
+function generateRandomString($length = 12) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+function sendEmail($address, $subject, $msg, $header){
+  mail($address, $subject, $msg, $header);
+}
+function generateRegisterEmail($address, $str){
+  $msg = "Welcome to the app!  Please click the link to verify your account ";
+  $msg .= VERIFY_ACCOUNT_ADDRESS;
+  $msg .= "?str=".$str;
+
+  $msg = wordwrap($msg,70);
+
+  mail($address,"App Account Verification",$msg, 'From: kramerkelby@gmail.com');
+}
+
+function dateDiff($date1, $date2){
+  // Formulate the Difference between two dates
+  $diff = abs($date2 - $date1);
+
+  // To get the year divide the resultant date into
+  // total seconds in a year (365*60*60*24)
+  $years = floor($diff / (365*60*60*24));
+
+  // To get the month, subtract it with years and
+  // divide the resultant date into
+  // total seconds in a month (30*60*60*24)
+  $months = floor(($diff - $years * 365*60*60*24)
+                                 / (30*60*60*24));
+
+  // To get the day, subtract it with years and
+  // months and divide the resultant date into
+  // total seconds in a days (60*60*24)
+  $days = floor(($diff - $years * 365*60*60*24 -
+               $months*30*60*60*24)/ (60*60*24));
+
+  // To get the hour, subtract it with years,
+  // months & seconds and divide the resultant
+  // date into total seconds in a hours (60*60)
+  $hours = floor(($diff - $years * 365*60*60*24
+         - $months*30*60*60*24 - $days*60*60*24)
+                                     / (60*60));
+
+  // To get the minutes, subtract it with years,
+  // months, seconds and hours and divide the
+  // resultant date into total seconds i.e. 60
+  $minutes = floor(($diff - $years * 365*60*60*24
+           - $months*30*60*60*24 - $days*60*60*24
+                            - $hours*60*60)/ 60);
+
+  // To get the minutes, subtract it with years,
+  // months, seconds, hours and minutes
+  $seconds = floor(($diff - $years * 365*60*60*24
+           - $months*30*60*60*24 - $days*60*60*24
+                  - $hours*60*60 - $minutes*60));
+
+  if($years > 0 || $months > 0){
+    return 0;
+  }
+  else{
+    $ret = $days * 86400+ $hours * 3600+ $minutes * 60+ $seconds;
+    return $ret;
+  }
+}
+
 //TODO: Test this function
 function coordinateCheck($event_coords, $user_coordinates){
   $topLeftLat = floatval($event_coords[0]);
@@ -319,13 +395,13 @@ function generateEventArray($result){
 
 
 //TODO: Test this function
-function registerUser($username, $password, $email){
+function registerUser($username, $password, $email, $str){
   $conn = dbConnect();
   $sanitized_username = mysqli_real_escape_string($conn, $username);
   $sanitized_password = mysqli_real_escape_string($conn, $password);
   $sanitized_email = mysqli_real_escape_string($conn, $email);
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
-  $sql = "INSERT INTO users (Username, Password, email) VALUES ('$sanitized_username', '$hashed_password', '$sanitized_email')";
+  $sql = "INSERT INTO users (Username, Password, email, verifyString) VALUES ('$sanitized_username', '$hashed_password', '$sanitized_email', '$str')";
   //$sql = "DELETE FROM users WHERE Username='Kelby'";
   echo "Hello register the user please";
   $result = mysqli_query($conn, $sql);

@@ -6,7 +6,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     date_default_timezone_set('America/Chicago'); // CDT
 
-    $current_date = date('Y/m/d');
+    $current_date = date('Y-m-d');
     $current_time = date('H:i:s');
     $error = False;
     //backlog check
@@ -14,10 +14,116 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $where = array("User_ID" => $_SESSION['id'], "event_id" => $_POST['eventID']);
     $result = query("eventbacklog", "*", $where);
 
-    if ($result->num_rows > 0) {
-      echo "This promo already exists in the backlog";
+    //Initial check for redeemTime2 and 1 and error throwing
+
+    if($result->num_rows > 0){
+      while($row = $result->fetch_assoc()) {
+        //var_dump($row);
+        $redeemTime2 = $row['redeemTime2'];
+        $redeemTime1 = $row['redeemTime1'];
+      }
+
+      if($redeemTime2 != NULL){
+        echo "This promo already exists in the backlog with RT1 and RT2";
+      }
+      else if($redeemTime1 != NULL){
+        echo "RedeemTime1 is not NULL";
+        //redeemTime2 is null, but redeemTime1 is not, so token redemption
+        //process will be checked
+        $date2 = date('Y-m-d H:i:s');
+        //$date2 = date('2022-03-26 15:44:15');
+        $date1 = strtotime($redeemTime1);
+        $date2 = strtotime($date2);
+        //check to see if there is more than 15 minute difference between two dates
+        $dateDifference = dateDiff($date1, $date2);
+
+        if($dateDifference > 900){
+          //user has been at game for 15 minutes and can redeem tokens
+          echo "The date difference is legit";
+
+          $result = innerJoinQuery("events", "locations", "events.*", "locations.latLong", "events.Loc_ID=locations.Loc_ID", "events.Event_ID=".$_POST['eventID']);
+
+          if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+              //var_dump($row);
+              $start = $row['start'];
+              $finish = $row['finish'];
+              $date = $row['date'];
+              $reward = $row['tokens'];
+              $coords = $row['latLong'];
+            }
+          }
+
+          $event_coords = explode(",", $coords);
+          $user_coordinates = explode(" ", $_POST['coordinates']);
+          $Loc_error = coordinateCheck($event_coords, $user_coordinates);
+
+          $time_Error = False;
+          $date_Error = False;
+          $time_Error = timeCheck($start, $finish, $current_time);
+          $date_Error = dateCheck($date, $current_date);
+
+          if ($Loc_error || $time_Error || $date_Error){
+            echo "<div style='border:1px solid black;'>There was an error</div>";
+            if($Loc_error){
+              echo "<div style='border:1px solid black;'>You are not in the location radius".$coords." ".$_POST['coordinates']."</div>";
+            }
+
+            if($time_Error){
+              echo "<div style='border:1px solid black;'>You are not within the specified time for this event</div>";
+            }
+
+            if($date_Error){
+              echo "<div style='border:1px solid black;'>You are not within the specified date for this event</div>";
+            }
+          }
+          else{
+            echo "Tokens are being redeemed ";
+            //not an error, do token redemption
+            //not an error, insert into event backlog with redeemTime1
+            $tokens = $_SESSION['tokens'];
+            $newTokens = $tokens + $reward;
+            $newTotalTokens = 0;
+            $conn = dbConnect();
+            $result = updateQuery("users", "current_tokens=".$newTokens, "User_ID=".$_SESSION['id']);
+
+            $_SESSION['tokens'] = $newTokens;
+
+            $user_id = $_SESSION['id'];
+            $event_id = $_POST['eventID'];
+            $redeemTime2 = date('Y-m-d H:i:s');
+            //$sql = "INSERT INTO eventbacklog (User_ID, event_ID, redeemTime1) VALUES (?, ?, ?)";
+            updateQuery("eventbacklog", "redeemTime2='".$redeemTime2."'", " event_ID=".$event_id." AND User_ID=".$user_id);
+            //insertQuery($sql, $user_id, $event_id, $redeemTime1);
+
+            echo "<div style='border:1px solid black;'>You have checked into this event.  Redeem again 15 minutes later to receive tokens.</div>";
+          }
+          //token insertion process
+          /*
+          $tokens = $_SESSION['tokens'];
+          $newTokens = $tokens + $reward;
+          $newTotalTokens = 0;
+          $conn = dbConnect();
+          $result = updateQuery("users", "current_tokens=".$newTokens, "User_ID=".$_SESSION['id']);
+
+          $_SESSION['tokens'] = $newTokens;*/
+        }
+        else{
+          $userDiff = 900 - $dateDifference;
+          $minutes = intval($userDiff / 60);
+          $seconds = $userDiff - ($minutes * 60);
+          echo "<div style='border:1px solid black;'>You have to be at an event for at least 15 minutes to redeem</div>";
+          echo "<div style='border:1px solid black;'>Wait another ".$minutes." minutes and ".$seconds." seconds!</div>";
+        }
+      }
+      else{
+        //both redeemTime1 and 2 were NULL, so the event needs to be inserted into
+        //backlog with redeemTime1 being the current Time
+      }
     }
     else{
+      //event is not in backlog
+
       $result = innerJoinQuery("events", "locations", "events.*", "locations.latLong", "events.Loc_ID=locations.Loc_ID", "events.Event_ID=".$_POST['eventID']);
 
       if ($result->num_rows > 0) {
@@ -43,7 +149,61 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       if ($Loc_error || $time_Error || $date_Error){
         echo "<div style='border:1px solid black;'>There was an error</div>";
         if($Loc_error){
-          echo "<div style='border:1px solid black;'>You are not in the location radius</div>";
+          echo "<div style='border:1px solid black;'>You are not in the location radius".$coords." ".$_POST['coordinates']."</div>";
+        }
+
+        if($time_Error){
+          echo "<div style='border:1px solid black;'>You are not within the specified time for this event</div>";
+        }
+
+        if($date_Error){
+          echo "<div style='border:1px solid black;'>You are not within the specified date for this event</div>";
+        }
+      }
+      else{
+        //not an error, do token redemption
+        //not an error, insert into event backlog with redeemTime1
+        $user_id = $_SESSION['id'];
+        $event_id = $_POST['eventID'];
+        $redeemTime1 = date('Y-m-d H:i:s');
+        $sql = "INSERT INTO eventbacklog (User_ID, event_ID, redeemTime1) VALUES (?, ?, ?)";
+        insertQuery($sql, $user_id, $event_id, $redeemTime1);
+
+        echo "<div style='border:1px solid black;'>You have checked into this event.  Redeem again 15 minutes later to receive tokens.</div>";
+      }
+    }
+/*
+    if ($result->num_rows > 0) {
+      //echo "This promo already exists in the backlog";
+    }
+    else{
+/*
+      $result = innerJoinQuery("events", "locations", "events.*", "locations.latLong", "events.Loc_ID=locations.Loc_ID", "events.Event_ID=".$_POST['eventID']);
+
+      if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+          //var_dump($row);
+          $start = $row['start'];
+          $finish = $row['finish'];
+          $date = $row['date'];
+          $reward = $row['tokens'];
+          $coords = $row['latLong'];
+        }
+      }
+
+      $event_coords = explode(",", $coords);
+      $user_coordinates = explode(" ", $_POST['coordinates']);
+      $Loc_error = coordinateCheck($event_coords, $user_coordinates);
+
+      $time_Error = False;
+      $date_Error = False;
+      $time_Error = timeCheck($start, $finish, $current_time);
+      $date_Error = dateCheck($date, $current_date);
+
+      if ($Loc_error || $time_Error || $date_Error){
+        echo "<div style='border:1px solid black;'>There was an error</div>";
+        if($Loc_error){
+          echo "<div style='border:1px solid black;'>You are not in the location radius".$coords." ".$_POST['coordinates']."</div>";
         }
 
         if($time_Error){
@@ -70,10 +230,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         insertQuery($sql, $user_id, $event_id);
 
         echo "Great success!";
-      }
-    }
+      }*/
+    //}
     //time check
-
   }
   else if ($_POST['func'] == "loadHome"){
     //Events information

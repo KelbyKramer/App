@@ -1,5 +1,6 @@
 <?php
 include("src/functions.php");
+include("header.php");
 
 if(isset($_POST) && count($_POST) == 2){
 

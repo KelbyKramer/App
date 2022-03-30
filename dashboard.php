@@ -61,15 +61,14 @@ if($id != $_SESSION['id']){
     <div id='redeemForm' class='formAttributes hideform'>
       <div>This is a test div</div>
    </div>
-     <div>Events coming up</div>
-<!--
-     <label for="sort">Sort Events By:</label>
-      <select name="sort" id="sort">
-       <option value="sport">Sport</option>
-       <option value="date">Date</option>
-       <option value="amount">Reward Amount</option>
+   <!--
+     <select class="div-toggle" data-target=".target">
+       <option value="orange" data-show=".Athletic">Athletic Events</option>
+       <option value="lemon" data-show=".nonAthletic">Non Athletic Events</option>
      </select>-->
-     <div id="scrollbox">
+     <div style='color:black;' id='hello'></div>
+
+     <div class='target' id="scrollbox">
      </div>
    </main>
    <footer>
@@ -124,6 +123,16 @@ document.addEventListener('mouseup', function(e) {
     if (!container.contains(e.target)) {
         container.style.display = 'none';
     }
+});
+
+$(document).on('change', '.div-toggle', function() {
+  var target = $(this).data('target');
+  var show = $("option:selected", this).data('show');
+  $(target).children().addClass('hide');
+  $(show).removeClass('hide');
+});
+$(document).ready(function(){
+    $('.div-toggle').trigger('change');
 });
 
 

@@ -1,5 +1,5 @@
 <?php
-
+/*
 //Include required PHPMailer files
 	require 'includes/PHPMailer.php';
 	require 'includes/SMTP.php';
@@ -12,6 +12,7 @@
 	$mail = new PHPMailer();
 //Set mailer to use smtp
 	$mail->isSMTP();
+
 //Define smtp host
 	$mail->Host = "smtp.gmail.com";
 //Enable smtp authentication
@@ -30,6 +31,7 @@
 	$mail->setFrom('kramerkelby@gmail.com');
 //Enable HTML
 	$mail->isHTML(true);
+
 //Attachment
 	//$mail->addAttachment('img/attachment.png');
 //Email body
@@ -37,6 +39,7 @@
 //Add recipient
 	$mail->addAddress('kramerkelby@gmail.com');
 //Finally send email
+
 	if ( $mail->send() ) {
 		echo "Email Sent..!";
 	}else{
@@ -44,5 +47,14 @@
 	}
 //Closing smtp connection
 	$mail->smtpClose();
+*/
+
+//$msg = "First line of text\nSecond line of text";
+
+// use wordwrap() if lines are longer than 70 characters
+//$msg = wordwrap($msg,70);
+
+// send email
+//mail("kramerkelby@gmail.com","My subject",$msg, 'From: kramerkelby@gmail.com');
 
  ?>

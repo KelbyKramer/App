@@ -88,11 +88,15 @@ function displayLeaderboard(){
 }
 
 function ajax(event_id){
+
   getGeoLocation();
   console.log(event_id);
   var coords = "";
+
   var checkExist = setInterval(function() {
+
   if ($('#coords').length) {
+      //$('#hello').html("There is content here");
       console.log("Exists!");
       coords = $('#coords').text();
       clearInterval(checkExist);
