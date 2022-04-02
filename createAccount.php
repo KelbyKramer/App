@@ -6,28 +6,28 @@ if(isset($_POST) && count($_POST) > 0){
   $errorCount = 0;
   $errorMessage = "";
   if($_POST['userName'] == "" || !(isset($_POST['userName']))){
-    echo "<div style='color:black;'>Username cannot be blank</div>";
+    $errorMessage .= "<div class='error'>Username cannot be blank</div>";
     $errorCount++;
   }
 
   if($_POST['email'] == "" || !(isset($_POST['email']))){
-    echo "<div style='color:black;'>Email cannot be blank</div>";
+    $errorMessage .= "<div class='error'>Email cannot be blank</div>";
     $errorCount++;
   }
 
   if(strpos($_POST['email'], "mnsu.edu") == False){
-    $errorMessage .= "<div style='color:black;'>Email must be your mnsu.edu email</div>";
+    $errorMessage .= "<div class='error'>Email must be your mnsu.edu email</div>";
     $errorCount++;
   }
 
   //passwords dont match
   if($_POST['password'] != $_POST['re-password']){
-    echo "<div style='color:black;'>Passwords don't match</div>";
+    $errorMessage .= "<div class='error'>Passwords don't match</div>";
     $errorCount++;
   }
   //passwords arent sufficient length
   if(strlen($_POST['password']) < 6 && strlen($_POST['re-password']) < 6){
-    echo "<div style='color:black;'>Password must be at least 6 characters long</div>";
+    $errorMessage .="<div class='error'>Password must be at least 6 characters long</div>";
     $errorCount++;
   }
 
@@ -35,6 +35,9 @@ if(isset($_POST) && count($_POST) > 0){
   $username = $_POST['userName'];
   $password = $_POST['password'];
   $email = $_POST['email'];
+  $age = $_POST['age'];
+  $major = $_POST['major'];
+  $living = $_POST['living'];
   //TODO: This query is unsafe
   //$sql = "SELECT * FROM users WHERE Username='$username'";
   $result = query("users", "*", array('Username' => $username));
@@ -42,7 +45,7 @@ if(isset($_POST) && count($_POST) > 0){
   //$result = $conn->query($sql);
   if ($result->num_rows > 0) {
     //username is taken
-    echo "<div style='color:black;'>Username is alreay taken</div>";
+    $errorMessage .= "<div class='error'>Username is alreay taken</div>";
     $errorCount++;
   }
 
@@ -50,18 +53,18 @@ if(isset($_POST) && count($_POST) > 0){
 
   if ($result->num_rows > 0) {
     //username is taken
-    echo "<div style='color:black;'>Email is alreay taken</div>";
+    $errorMessage .= "<div class='error'>Email is alreay taken</div>";
     $errorCount++;
   }
   //At this point, the user has created a valid Account
   if($errorCount == 0){
     //register the user and log them in
-    echo "An email has been sent, click the link to confirm your registration";
+    echo "<div class='error'>An email has been sent, click the link to confirm your registration</div>";
     //generate 12 character string to put into database and send in mail link
     $str = generateRandomString();
-    echo $str;
+    //echo $str;
     generateRegisterEmail("kramerkelby@gmail.com", $str);
-    registerUser($username, $password, $email, $str);
+    registerUser($username, $password, $email, $str, $age, $major, $living);
     //login($username, $password);
   }
   else{
@@ -83,6 +86,8 @@ if(isset($_POST) && count($_POST) > 0){
  <script src="src/script.js"></script>
  </head>
 
+<body class='createAccount'>
+  <button id='back'><a style='text-decoration: none;' href='index.php'>Return to Login Screen</a></button>
   <form method='post' action=''>
     <input id="field" name='userName' type="text" placeholder='Username' autocomplete='off'/>
     <input id="email" name='email' type="text" placeholder='E-mail (Use your @mnsu.edu email)' autocomplete='off'/>
@@ -94,7 +99,7 @@ if(isset($_POST) && count($_POST) > 0){
     <button id="submit" type="submit">Create Account</button>
   </form>
   <button id="expand" onclick="showExtraFields();">Want 100 free tokens?  Click here to provide more information</button>
-
+</body>
  </html>
 
  <script>

@@ -24,7 +24,6 @@ div#scrollbox{
   width:80%;
   background-color: #2a2a72;
   background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);
-  background-color:green;
   height:30rem;
   overflow:scroll;
   padding:5px;
@@ -43,7 +42,6 @@ ul {
   overflow: hidden;
   background-color: #333;
   width:100%;
-
 }
 
 li {
@@ -62,6 +60,8 @@ li a {
 li a:hover {
   background-color: #111;
 }
+
+
 
 @media(max-width: 800px){
   body{
@@ -87,6 +87,28 @@ li a:hover {
       "div"
       "div"
       "footer"
+  }
+  body.createAccount{
+    display:block;
+  }
+  .error{
+    color:black
+  }
+  #expand{
+    justify-content: center;
+    align-items: center;
+    border: 3px solid black;
+    font-size:2rem;
+    color:white;
+    background-color:#0a263b;
+  }
+  #back{
+    justify-content: center;
+    align-items: center;
+    border: 3px solid black;
+    font-size:2rem;
+    color:white;
+    background-color:#0a263b;
   }
   h2{
     font-size: 1rem;
@@ -148,10 +170,18 @@ li a:hover {
     border:3px solid black;
     display:grid;
     line-height: 2rem;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
     grid-template-rows: 1fr;
     grid-template-areas:
       "span" "span" "span"
+  }
+  .eventField{
+    border-bottom: 1px solid black;
+  }
+  .eventButton{
+    background-color:#0a263b;
+    color:white;
+    border: 3px solid black;
   }
   div#test img{
     height: 50px;

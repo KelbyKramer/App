@@ -66,7 +66,7 @@ function updateQuery($table, $set, $where=""){
     $ret .= " WHERE ".$where;
   }
   $ret .= "";
-  echo $ret;
+  //echo $ret;
   $result = mysqli_query($db, $ret);
   //closeDB($db);
   return $result;
@@ -259,12 +259,12 @@ function login($username, $password){
     }
     $error = False;
     if($verify == 0){
-      echo "Account has not yet been verified";
+      echo "<div class='error'>Account has not yet been verified.  Click the link sent to your email</div>";
       $error = True;
     }
 
     if(!password_verify($password, $hashFromDatabase)){
-      echo "Password is invalid";
+      echo "<div class='error'>Password is invalid</div>";
       $error = True;
     }
 
@@ -277,7 +277,7 @@ function login($username, $password){
     }
   }
   else{
-    echo "<center>Credentials were not successful</center>";
+    echo "<center><div class='error'>Credentials were not successful</div></center>";
   }
 }
 //TODO: Test this function
@@ -312,7 +312,7 @@ function generatePromoHTML($arr){
     $ret .= "</span>";
     $ret .= "<span>";
     $ret .= "<div>Cost: ".$promo['cost']." Tokens</div>";
-    $ret .= "<button id='".$promo['promo_ID']."'onclick='purchasePromo(".$promo['promo_ID'].")'>Purchase this Promo</button>";
+    $ret .= "<button class='eventButton' id='".$promo['promo_ID']."'onclick='purchasePromo(".$promo['promo_ID'].")'>Purchase this Promo</button>";
     $ret .= "</span>";
     $ret .= "</div>";
     $ret .= "</div>";
@@ -348,17 +348,24 @@ function generateRedeemPromoHTML($arr){
     $ret .= "<div>".$promo['Title']."</div>";
     $ret .= "</span>";
     $ret .= "<span>";
-    $ret .= "<button id='".$promo['Promo_ID']."'onclick='displayRedeemPromo(".$promo['Promo_ID'].")'>Redeem this Promo</button>";
+    $ret .= "<button class='eventButton' id='".$promo['Promo_ID']."'onclick='displayRedeemPromo(".$promo['Promo_ID'].")'>Redeem this Promo</button>";
     $ret .= "</span>";
     $ret .= "</div>";
     $ret .= "</div>";
   }
   return $ret;
 }
+
+function convertAddressToLink($address){
+  $ret = str_replace(' ', '+', $address);
+  return $ret;
+}
 //TODO: Test this function
 function generateHTML($arr){
   $ret = "";
   foreach($arr as $event){
+    $link = convertAddressToLink($event['address']);
+    //$ret .= "<div id='event ".$event['Event_ID']."'>";
     $ret .= "<div id='event ".$event['Event_ID']."'>";
     $ret .= "<div id='test'>";
     $ret .= "<span>";
@@ -368,14 +375,14 @@ function generateHTML($arr){
     $ret .= "<span>";
     $date = convertDate($event['date']);
     $time = convertTime($event['start']);
-    $ret .= "<div>".$date."</div>";
-    $ret .= "<div>".$time."</div>";
-    $ret .= "<div>".$event['name']."</div>";
-    $ret .= "<div>".$event['address']."</div>";
+    $ret .= "<div class='eventField'>Date ".$date."</div>";
+    $ret .= "<div class='eventField'>Time ".$time."</div>";
+    $ret .= "<div class='eventField'>".$event['name']."</div>";
+    $ret .= "<div class='eventField'><a style='color: white; text-decoration:underline;' href='http://maps.apple.com/?q=$link' target='_blank'>".$event['address']."</a></div>";
     $ret .= "</span>";
     $ret .= "<span>";
     $ret .= "<div>Reward: ".$event['tokens']." Tokens</div>";
-    $ret .= "<button onclick='ajax(".$event['Event_ID'].")'>I am at the game</button>";
+    $ret .= "<button class='eventButton' onclick='ajax(".$event['Event_ID'].")'>I am at the game</button>";
     $ret .= "</span>";
     $ret .= "</div>";
     $ret .= "</div>";
@@ -393,17 +400,32 @@ function generateEventArray($result){
   return $ret;
 }
 
-
+function determineTokens($age, $major, $living){
+  $tokens = 0;
+  if($age != NULL){
+    $tokens += 25;
+  }
+  if($major != NULL){
+    $tokens += 25;
+  }
+  if($living != NULL){
+    $tokens += 50;
+  }
+  return $tokens;
+}
 //TODO: Test this function
-function registerUser($username, $password, $email, $str){
+function registerUser($username, $password, $email, $str, $age=NULL, $major=NULL, $living=MULL){
   $conn = dbConnect();
   $sanitized_username = mysqli_real_escape_string($conn, $username);
   $sanitized_password = mysqli_real_escape_string($conn, $password);
   $sanitized_email = mysqli_real_escape_string($conn, $email);
+  $sanitized_age = mysqli_real_escape_string($conn, $age);
+  $sanitized_major = mysqli_real_escape_string($conn, $major);
+  $sanitized_living = mysqli_real_escape_string($conn, $living);
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
-  $sql = "INSERT INTO users (Username, Password, email, verifyString) VALUES ('$sanitized_username', '$hashed_password', '$sanitized_email', '$str')";
-  //$sql = "DELETE FROM users WHERE Username='Kelby'";
-  echo "Hello register the user please";
+  $tokens = determineTokens($age, $major, $living);
+
+  $sql = "INSERT INTO users (Username, Password, email, verifyString, age, major, living, current_tokens, total_tokens) VALUES ('$sanitized_username', '$hashed_password', '$sanitized_email', '$str', '$sanitized_age', '$sanitized_major', '$sanitized_living', '$tokens', '$tokens')";
   $result = mysqli_query($conn, $sql);
   $_POST = array();
 }

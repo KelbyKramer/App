@@ -83,9 +83,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             //not an error, insert into event backlog with redeemTime1
             $tokens = $_SESSION['tokens'];
             $newTokens = $tokens + $reward;
-            $newTotalTokens = 0;
+            $newTotalTokens = $tokens + $reward;
             $conn = dbConnect();
-            $result = updateQuery("users", "current_tokens=".$newTokens, "User_ID=".$_SESSION['id']);
+            $result = updateQuery("users", "current_tokens=".$newTokens."total_tokens=".$newTotalTokens, "User_ID=".$_SESSION['id']);
 
             $_SESSION['tokens'] = $newTokens;
 
@@ -96,6 +96,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             updateQuery("eventbacklog", "redeemTime2='".$redeemTime2."'", " event_ID=".$event_id." AND User_ID=".$user_id);
             //insertQuery($sql, $user_id, $event_id, $redeemTime1);
 
+            echo $_POST['eventID'];
             echo "<div style='border:1px solid black;'>You have checked into this event.  Redeem again 15 minutes later to receive tokens.</div>";
           }
           //token insertion process
@@ -168,8 +169,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $redeemTime1 = date('Y-m-d H:i:s');
         $sql = "INSERT INTO eventbacklog (User_ID, event_ID, redeemTime1) VALUES (?, ?, ?)";
         insertQuery($sql, $user_id, $event_id, $redeemTime1);
-
+        echo $event_id;
         echo "<div style='border:1px solid black;'>You have checked into this event.  Redeem again 15 minutes later to receive tokens.</div>";
+
+        //TODO: Do an AJAX request here changing color of div
       }
     }
 /*
@@ -332,6 +335,35 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     }
     else{
       echo "You haven't purchased any promos";
+    }
+  }
+  else if($_POST['func'] == "colorEvents"){
+    session_start();
+    if(is_int($_SESSION['id'])){
+      $arr = array();
+      $result = query("eventbacklog", "*", array("User_ID" => $_SESSION['id']));
+      if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+          $time1 = $row['redeemTime1'];
+          $time2 = $row['redeemTime2'];
+          $event_id = $row['event_ID'];
+
+          if($time2 == NULL){
+            //checked in
+            $arr[$event_id] = "checked in";
+          }
+          else{
+            //event has been redeemed
+            $arr[$event_id] = "redeemed";
+          }
+        }
+      }
+
+      //TODO: test if no rows are seen
+      echo json_encode($arr);
+    }
+    else{
+      echo "Error";
     }
   }
 }

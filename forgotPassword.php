@@ -11,6 +11,7 @@ if(isset($_POST) && count($_POST) == 1){
   $msg = "Click here to reset your password: ".FORGOT_PASSWORD_ADDRESS."?str=".$str." This link expires in 15 minutes.";
   $msg = wordwrap($msg,70);
   updateQuery("users", "forgotPasswordString='".$str."' , forgotPasswordTimestamp='".$time."'", " email='".$email."'");
+  echo "<div class='error'>An email has been sent</div>";
   sendEmail("kramerkelby@gmail.com", "App Reset Password Link", $msg, 'From: kramerkelby@gmail.com');
 }
 

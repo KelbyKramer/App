@@ -6,10 +6,37 @@ function displayHome(){
     func: "displayEvents"
   },
   success: function(data){
-    console.log(data);
+    //console.log(data);
     $('#scrollbox').html(
         data
     );
+    colorEvents();
+  }
+});
+}
+
+
+function colorEvents(){
+  $.ajax({
+  url: "src/ajax.php",
+  type: "POST",
+  data: {
+    func: "colorEvents"
+  },
+  success: function(data){
+    var parse = JSON.parse(data);
+    console.log(parse);
+
+    for(var key in parse){
+      var x = document.getElementById("event " + key);
+      x.style.backgroundColor = "pink";
+      if(parse[key] == "checked in"){
+        x.style.backgroundColor = "pink";
+      }
+      if(parse[key] == "redeemed"){
+        x.style.backgroundColor = "gray";
+      }
+    }
   }
 });
 }
@@ -117,7 +144,7 @@ function ajax(event_id){
         else{
             displayEventMessage(data);
         }
-
+        colorEvents();
         console.log(data);
       }
       });

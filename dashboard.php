@@ -71,9 +71,6 @@ if($id != $_SESSION['id']){
      <div class='target' id="scrollbox">
      </div>
    </main>
-   <footer>
-     <p>Created by Kelby Kramer</p>
-  </footer>
  </body>
 </html>
 
