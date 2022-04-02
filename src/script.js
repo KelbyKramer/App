@@ -73,27 +73,6 @@ function displayMyPromos(){
 });
 }
 
-function redeemPromo(id){
-  /*
-  console.log("Promo is ready to be redeemed" + id);
-  var code = $('#redeem_code').val();
-
-  console.log(code);
-  $.ajax({
-  url: "src/ajax.php",
-  type: "POST",
-  data: {
-    func: "redeemPromo",
-    promo_id: id,
-    redeem_code: code
-  },
-  success: function(data){
-    console.log(data);
-    $('#redeemForm').html(data);
-  }
-});*/
-}
-
 function displayRedeemPromo(id){
   console.log("Have popup come up");
   $('#redeemForm').html($('#redeemPromo' + id).html());
@@ -113,6 +92,17 @@ function displayLeaderboard(){
       })
   );
 }
+
+function displayAchievements(){
+  $('#scrollbox').html(
+      $('<div>').prop({
+          id: 'innerdiv',
+          innerHTML: 'This feature has not been implemented yet',
+          className: 'border pad'
+      })
+  );
+}
+
 
 function ajax(event_id){
 
@@ -145,7 +135,9 @@ function ajax(event_id){
             displayEventMessage(data);
         }
         colorEvents();
-        console.log(data);
+        //update the token and session token values
+        updateTokenCountsEvent();
+        //TODO: get this done
       }
       });
    }
@@ -153,6 +145,33 @@ function ajax(event_id){
      console.log("Not accepted yet");
    }
  }, 100); // check every 100ms
+}
+
+function updateTokenCountsRedeem(){
+  $.ajax({
+  url: "src/ajax.php",
+  type: "POST",
+  data: {
+    func: "updateTokenCountsRedeem"
+  },
+  success: function(data){
+    console.log(data);
+    $('#tokens').html("Tokens: " + data);
+  }
+  });
+}
+
+function updateTokenCountsEvent(){
+  $.ajax({
+  url: "src/ajax.php",
+  type: "POST",
+  data: {
+    func: "updateTokenCountsEvent"
+  },
+  success: function(data){
+    console.log(data);
+  }
+  });
 }
 
 function getGeoLocation(){
@@ -184,10 +203,11 @@ function purchasePromo(button_id){
       promo_id: button_id,
     },
     success: function(data){
-      console.log(data);
+      //console.log(data);
 
       $('#confirmationForm').html(data);
     }
   });
+    updateTokenCountsRedeem();
   })
 }

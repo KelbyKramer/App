@@ -216,16 +216,6 @@ function queryUserPromos($sql, $where, $endText = "") {
     }
     $sql .= "Promo_ID=$clean_v";
   }
-  /*
-  foreach($where as $value) {
-    $sql .= " OR ";
-
-    $clean_v = $value;
-    if (is_string($value)) {
-      $clean_v = mysqli_real_escape_string($db, $value);
-    }
-    $sql .= "Promo_ID=$clean_v";
-  }*/
   $sql = "$sql ) $endText";
   //return $sql;
   $result = mysqli_query($db, $sql);
@@ -239,9 +229,9 @@ function login($username, $password){
   $sanitized_username = mysqli_real_escape_string($conn, $username);
   $sanitized_password = mysqli_real_escape_string($conn, $password);
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
-  $sql = "SELECT User_ID, Password, current_tokens, verify FROM users WHERE Username='$sanitized_username'";
+  //$sql = "SELECT User_ID, Password, current_tokens, verify, total_tokens FROM users WHERE Username='$sanitized_username'";
 
-  $stmt = $conn->prepare('SELECT User_ID, Password, current_tokens, verify FROM users WHERE Username= ?');
+  $stmt = $conn->prepare('SELECT User_ID, Password, current_tokens, verify, total_tokens FROM users WHERE Username= ?');
   $stmt->bind_param('s', $sanitized_username); // 's' specifies the variable type => 'string'
 
   $stmt->execute();
@@ -256,6 +246,7 @@ function login($username, $password){
       $id = $row['User_ID'];
       $tokens = $row['current_tokens'];
       $verify = $row['verify'];
+      $totalTokens = $row['total_tokens'];
     }
     $error = False;
     if($verify == 0){
@@ -272,7 +263,8 @@ function login($username, $password){
       session_start();
       $_SESSION['id'] = $id;
       $_SESSION['tokens'] = $tokens;
-      echo $_SESSION['id'];
+      $_SESSION['total_tokens'] = $totalTokens;
+      //echo $_SESSION['id'];
       header("location: dashboard.php?id=".$id);
     }
   }

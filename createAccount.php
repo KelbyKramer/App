@@ -96,6 +96,12 @@ if(isset($_POST) && count($_POST) > 0){
     <input style='display:none;' id="age" name='age' type="text" placeholder='Age (Optional)' autocomplete='off'/>
     <input style='display:none;' id="major" name='major' type="text" placeholder='Current Major (Optional)' autocomplete='off'/>
     <input style='display:none;' id="living" name='living' type="text" placeholder='Living Accomodations (Optional)' autocomplete='off'/>
+    <div class="elem-group">
+      <label for="captcha">Please Enter the Captcha Text</label>
+      <img src="captcha.php" alt="CAPTCHA" class="captcha-image"><i class="fas fa-redo refresh-captcha"></i>
+      <br>
+      <input type="text" id="captcha" name="captcha_challenge" pattern="[A-Z]{6}">
+    </div>
     <button id="submit" type="submit">Create Account</button>
   </form>
   <button id="expand" onclick="showExtraFields();">Want 100 free tokens?  Click here to provide more information</button>

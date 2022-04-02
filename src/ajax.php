@@ -100,14 +100,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             echo "<div style='border:1px solid black;'>You have checked into this event.  Redeem again 15 minutes later to receive tokens.</div>";
           }
           //token insertion process
-          /*
-          $tokens = $_SESSION['tokens'];
-          $newTokens = $tokens + $reward;
-          $newTotalTokens = 0;
-          $conn = dbConnect();
-          $result = updateQuery("users", "current_tokens=".$newTokens, "User_ID=".$_SESSION['id']);
-
-          $_SESSION['tokens'] = $newTokens;*/
         }
         else{
           $userDiff = 900 - $dateDifference;
@@ -175,70 +167,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         //TODO: Do an AJAX request here changing color of div
       }
     }
-/*
-    if ($result->num_rows > 0) {
-      //echo "This promo already exists in the backlog";
-    }
-    else{
-/*
-      $result = innerJoinQuery("events", "locations", "events.*", "locations.latLong", "events.Loc_ID=locations.Loc_ID", "events.Event_ID=".$_POST['eventID']);
-
-      if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-          //var_dump($row);
-          $start = $row['start'];
-          $finish = $row['finish'];
-          $date = $row['date'];
-          $reward = $row['tokens'];
-          $coords = $row['latLong'];
-        }
-      }
-
-      $event_coords = explode(",", $coords);
-      $user_coordinates = explode(" ", $_POST['coordinates']);
-      $Loc_error = coordinateCheck($event_coords, $user_coordinates);
-
-      $time_Error = False;
-      $date_Error = False;
-      $time_Error = timeCheck($start, $finish, $current_time);
-      $date_Error = dateCheck($date, $current_date);
-
-      if ($Loc_error || $time_Error || $date_Error){
-        echo "<div style='border:1px solid black;'>There was an error</div>";
-        if($Loc_error){
-          echo "<div style='border:1px solid black;'>You are not in the location radius".$coords." ".$_POST['coordinates']."</div>";
-        }
-
-        if($time_Error){
-          echo "<div style='border:1px solid black;'>You are not within the specified time for this event</div>";
-        }
-
-        if($date_Error){
-          echo "<div style='border:1px solid black;'>You are not within the specified date for this event</div>";
-        }
-      }
-      else{
-        //not an error, do token redemption
-        $tokens = $_SESSION['tokens'];
-        $newTokens = $tokens + $reward;
-        $newTotalTokens = 0;
-        $conn = dbConnect();
-        $result = updateQuery("users", "current_tokens=".$newTokens, "User_ID=".$_SESSION['id']);
-
-        $_SESSION['tokens'] = $newTokens;
-
-        $user_id = $_SESSION['id'];
-        $event_id = $_POST['eventID'];
-        $sql = "INSERT INTO eventbacklog (User_ID, event_ID) VALUES (?, ?)";
-        insertQuery($sql, $user_id, $event_id);
-
-        echo "Great success!";
-      }*/
-    //}
-    //time check
   }
-  else if ($_POST['func'] == "loadHome"){
-    //Events information
+  else if ($_POST['func'] == "updateTokenCountsEvent"){
+    session_start();
+    $currentTokens = $_SESSION['tokens'];
+    $totalTokens = $_SESSION['total_tokens'];
+
+    echo json_encode($currentTokens);
+    echo json_encode($totalTokens);
+  }
+  else if ($_POST['func'] == "updateTokenCountsRedeem"){
+    session_start();
+    $currentTokens = $_SESSION['tokens'];
+    echo json_encode($currentTokens);
 
   }
   else if($_POST['func'] == "purchasePromo"){
@@ -301,7 +242,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   else if($_POST['func'] == "displayEvents"){
 
     $conn = dbConnect();
-    $result = innerJoinQuery("events", "locations", "events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong", "", "events.Loc_ID=locations.Loc_ID", "", "events.date, events.start");
+    $result = innerJoinQuery("events", "locations", "events.Event_ID, events.type, events.tokens, events.start, events.finish, events.date, locations.name, locations.address, locations.latLong", "", "events.Loc_ID=locations.Loc_ID AND events.expireDateTime >= CURDATE()", "", "events.date, events.start");
     //echo $result;
     $arr = generateEventArray($result);
     $html =  generateHTML($arr);

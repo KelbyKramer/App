@@ -65,6 +65,12 @@ var_dump($result);*/
    <form method='post' action=''>
     <input id="field" name='userName' type="text" placeholder='Username' autocomplete='off'/>
     <input id="password" name='password' type="password" placeholder='Password' autocomplete='off'/>
+    <!--<div class="elem-group">
+      <label for="captcha">Please Enter the Captcha Text</label>
+      <img src="captcha.php" alt="CAPTCHA" class="captcha-image"><i class="fas fa-redo refresh-captcha"></i>
+      <br>
+      <input type="text" id="captcha" name="captcha_challenge" pattern="[A-Z]{6}">
+    </div>-->
     <button type="submit" id="submit">Login</button>
   </form>
   <div>
