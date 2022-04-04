@@ -374,7 +374,7 @@ function generateHTML($arr){
     $ret .= "</span>";
     $ret .= "<span>";
     $ret .= "<div>Reward: ".$event['tokens']." Tokens</div>";
-    $ret .= "<button class='eventButton' onclick='ajax(".$event['Event_ID'].")'>I am at the game</button>";
+    $ret .= "<button id='".$event['Event_ID']."' class='eventButton' onclick='ajax(".$event['Event_ID'].")'>Check into this event</button>";
     $ret .= "</span>";
     $ret .= "</div>";
     $ret .= "</div>";

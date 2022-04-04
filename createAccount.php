@@ -5,6 +5,13 @@ include("src/functions.php");
 if(isset($_POST) && count($_POST) > 0){
   $errorCount = 0;
   $errorMessage = "";
+  session_start();
+  echo $_SESSION['captcha_text'];
+  echo $_POST['captcha_challenge'];
+  if($_SESSION['captcha_text'] != $_POST['captcha_challenge']){
+    $errorMessage .= "<div class='error'>The CAPTCHA was entered incorrectly</div>";
+    $errorCount++;
+  }
   if($_POST['userName'] == "" || !(isset($_POST['userName']))){
     $errorMessage .= "<div class='error'>Username cannot be blank</div>";
     $errorCount++;
@@ -93,18 +100,18 @@ if(isset($_POST) && count($_POST) > 0){
     <input id="email" name='email' type="text" placeholder='E-mail (Use your @mnsu.edu email)' autocomplete='off'/>
     <input id="password" name='password' type="password" placeholder='Password (Must be at least 6 characters)' autocomplete='off'/>
     <input id="re-password" name='re-password' type="password" placeholder='Re-Enter Password' autocomplete='off'/>
+    <button type='button' id="expand" onclick="showExtraFields();">Want 100 free tokens?  Click here to provide more information</button>
     <input style='display:none;' id="age" name='age' type="text" placeholder='Age (Optional)' autocomplete='off'/>
     <input style='display:none;' id="major" name='major' type="text" placeholder='Current Major (Optional)' autocomplete='off'/>
     <input style='display:none;' id="living" name='living' type="text" placeholder='Living Accomodations (Optional)' autocomplete='off'/>
     <div class="elem-group">
-      <label for="captcha">Please Enter the Captcha Text</label>
       <img src="captcha.php" alt="CAPTCHA" class="captcha-image"><i class="fas fa-redo refresh-captcha"></i>
       <br>
-      <input type="text" id="captcha" name="captcha_challenge" pattern="[A-Z]{6}">
+      <input type="text" id="captcha" name="captcha_challenge" placeholder="Enter the above CAPTCHA text">
     </div>
     <button id="submit" type="submit">Create Account</button>
   </form>
-  <button id="expand" onclick="showExtraFields();">Want 100 free tokens?  Click here to provide more information</button>
+
 </body>
  </html>
 

@@ -29,12 +29,25 @@ function colorEvents(){
 
     for(var key in parse){
       var x = document.getElementById("event " + key);
-      x.style.backgroundColor = "pink";
+      //x.style.backgroundColor = "pink";
+      var y = x.childNodes;
+      var div = document.createElement('div');
+      div.id = "hello";
+
+      div.className = 'overlay';
+      var button = document.getElementById(key);
+      //
+      y[0].appendChild(div);
       if(parse[key] == "checked in"){
-        x.style.backgroundColor = "pink";
+        x.style.backgroundColor = "#d4ac0d ";
+        div.innerHTML = "Checked In";
+        button.innerHTML = "Redeem Tokens for this Event";
       }
       if(parse[key] == "redeemed"){
-        x.style.backgroundColor = "gray";
+        x.style.backgroundColor = "#922b21 ";
+        div.innerHTML = "Redeemed";
+        button.innerHTML = "You've already redeemed tokens for this event";
+        button.disabled = 'disabled';
       }
     }
   }
