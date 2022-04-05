@@ -15,7 +15,6 @@ function displayHome(){
 });
 }
 
-
 function colorEvents(){
   $.ajax({
   url: "src/ajax.php",
@@ -32,7 +31,7 @@ function colorEvents(){
       //x.style.backgroundColor = "pink";
       var y = x.childNodes;
       var div = document.createElement('div');
-      div.id = "hello";
+      div.id = "overlay" + key;
 
       div.className = 'overlay';
       var button = document.getElementById(key);
@@ -45,6 +44,8 @@ function colorEvents(){
       }
       if(parse[key] == "redeemed"){
         x.style.backgroundColor = "#922b21 ";
+        var oldDiv = document.getElementById("overlay" + key);
+        oldDiv.style.display = "none";
         div.innerHTML = "Redeemed";
         button.innerHTML = "You've already redeemed tokens for this event";
         button.disabled = 'disabled';
@@ -94,6 +95,10 @@ function displayRedeemPromo(id){
 
 function closeRedeemPromo(){
   $('#redeemForm').hide();
+}
+
+function closeEvent(){
+  $('#eventMessage').hide();
 }
 
 function displayLeaderboard(){
@@ -190,14 +195,28 @@ function updateTokenCountsEvent(){
 function getGeoLocation(){
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);
+
+    navigator.geolocation.watchPosition(function(position) {
+      console.log("i'm tracking you!");
+    },
+    function(error) {
+      if (error.code == error.PERMISSION_DENIED){
+        console.log("you denied me :-(");
+        //TODO: display the deny location error to user
+        navigator.geolocation.getCurrentPosition(showPosition);
+      }
+
+    });
   } else {
     console.log("Geolocation is not supported by this browser.");
   }
 }
 
 function showPosition(position) {
+
   var coords = "<p id='coords'>" + position.coords.latitude + " " + position.coords.longitude + "</p>";
   $("body").append(coords);
+  queryLocPerms();
 }
 
 function displayEventMessage(message){
@@ -223,4 +242,32 @@ function purchasePromo(button_id){
   });
     updateTokenCountsRedeem();
   })
+}
+
+function queryLocPerms(){
+  navigator.permissions.query({
+     name: 'geolocation'
+  }).then(function(result) {
+     if (result.state == 'granted') {
+         //alert(result.state);
+         console.log("granted");
+         $('#locationStatus').html("Granted");
+         //geoBtn.style.display = 'none';
+     } else if (result.state == 'prompt') {
+         //alert(result.state);
+         //geoBtn.style.display = 'none';
+         console.log("prompt");
+         $('#locationStatus').html("Prompt");
+         //navigator.geolocation.getCurrentPosition(revealPosition, positionDenied, geoSettings);
+     } else if (result.state == 'denied') {
+         //alert(result.state);
+         //geoBtn.style.display = 'inline';
+         console.log("denied");
+         $('#locationStatus').html("Denied");
+     }
+     result.onchange = function() {
+         //alert(result.state);
+         $('#locationStatus').html("Changed");
+     }
+  });
 }

@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $result = query("eventbacklog", "*", $where);
 
     //Initial check for redeemTime2 and 1 and error throwing
-
+    echo "<button id='closeEvent' onclick='closeEvent()' style='float: right; color: red;'>X</button>";
     if($result->num_rows > 0){
       while($row = $result->fetch_assoc()) {
         //var_dump($row);
@@ -24,10 +24,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       }
 
       if($redeemTime2 != NULL){
-        echo "This promo already exists in the backlog with RT1 and RT2";
+        //echo "This promo already exists in the backlog with RT1 and RT2";
+        echo "This event has already been redeemed";
       }
       else if($redeemTime1 != NULL){
-        echo "RedeemTime1 is not NULL";
         //redeemTime2 is null, but redeemTime1 is not, so token redemption
         //process will be checked
         $date2 = date('Y-m-d H:i:s');
@@ -39,7 +39,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
         if($dateDifference > 900){
           //user has been at game for 15 minutes and can redeem tokens
-          echo "The date difference is legit";
+          //echo "The date difference is legit";
 
           $result = innerJoinQuery("events", "locations", "events.*", "locations.latLong", "events.Loc_ID=locations.Loc_ID", "events.Event_ID=".$_POST['eventID']);
 
@@ -85,18 +85,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $newTokens = $tokens + $reward;
             $newTotalTokens = $tokens + $reward;
             $conn = dbConnect();
-            $result = updateQuery("users", "current_tokens=".$newTokens."total_tokens=".$newTotalTokens, "User_ID=".$_SESSION['id']);
+            $result = updateQuery("users", "current_tokens=".$newTokens.", total_tokens=".$newTotalTokens, "User_ID=".$_SESSION['id']);
 
             $_SESSION['tokens'] = $newTokens;
+            $_SESSION['totalTokens'] = $newTotalTokens;
 
             $user_id = $_SESSION['id'];
             $event_id = $_POST['eventID'];
             $redeemTime2 = date('Y-m-d H:i:s');
             //$sql = "INSERT INTO eventbacklog (User_ID, event_ID, redeemTime1) VALUES (?, ?, ?)";
             updateQuery("eventbacklog", "redeemTime2='".$redeemTime2."'", " event_ID=".$event_id." AND User_ID=".$user_id);
-            //insertQuery($sql, $user_id, $event_id, $redeemTime1);
-
-            echo $_POST['eventID'];
             echo "<div style='border:1px solid black;'>You have checked into this event.  Redeem again 15 minutes later to receive tokens.</div>";
           }
           //token insertion process

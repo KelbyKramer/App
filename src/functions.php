@@ -231,7 +231,7 @@ function login($username, $password){
   $hashed_password = password_hash($sanitized_password, PASSWORD_DEFAULT);
   //$sql = "SELECT User_ID, Password, current_tokens, verify, total_tokens FROM users WHERE Username='$sanitized_username'";
 
-  $stmt = $conn->prepare('SELECT User_ID, Password, current_tokens, verify, total_tokens FROM users WHERE Username= ?');
+  $stmt = $conn->prepare('SELECT User_ID, Username, Password, current_tokens, verify, total_tokens FROM users WHERE Username= ?');
   $stmt->bind_param('s', $sanitized_username); // 's' specifies the variable type => 'string'
 
   $stmt->execute();
@@ -247,6 +247,7 @@ function login($username, $password){
       $tokens = $row['current_tokens'];
       $verify = $row['verify'];
       $totalTokens = $row['total_tokens'];
+      $userName = $row['Username'];
     }
     $error = False;
     if($verify == 0){
@@ -264,6 +265,7 @@ function login($username, $password){
       $_SESSION['id'] = $id;
       $_SESSION['tokens'] = $tokens;
       $_SESSION['total_tokens'] = $totalTokens;
+      $_SESSION['userName'] = $userName;
       //echo $_SESSION['id'];
       header("location: dashboard.php?id=".$id);
     }

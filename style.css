@@ -63,7 +63,7 @@ li a:hover {
 
 
 
-@media(max-width: 800px){
+/*@media(max-width: 800px){*/
   body{
     color: white;
     background: #ffffff;
@@ -253,7 +253,7 @@ li a:hover {
   }
 
   div#eventMessage{
-    z-index: 3;
+    z-index: 30;
     color: black;
     background-color: gray;
     position: absolute;
@@ -277,4 +277,4 @@ li a:hover {
   a#forgotPassword{
 
   }
-}
+/*}*/
