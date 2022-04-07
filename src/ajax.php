@@ -37,7 +37,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         //check to see if there is more than 15 minute difference between two dates
         $dateDifference = dateDiff($date1, $date2);
 
-        if($dateDifference > 900){
+        if($dateDifference > 90){
           //user has been at game for 15 minutes and can redeem tokens
           //echo "The date difference is legit";
 
@@ -169,15 +169,26 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   else if ($_POST['func'] == "updateTokenCountsEvent"){
     session_start();
     $currentTokens = $_SESSION['tokens'];
-    $totalTokens = $_SESSION['total_tokens'];
-
-    echo json_encode($currentTokens);
-    echo json_encode($totalTokens);
+    $totalTokens = $_SESSION['totalTokens'];
+    $arr = array($currentTokens, $totalTokens);
+    echo json_encode($arr);
+    //echo json_encode($currentTokens);
+    //echo json_encode($totalTokens);
   }
   else if ($_POST['func'] == "updateTokenCountsRedeem"){
     session_start();
     $currentTokens = $_SESSION['tokens'];
     echo json_encode($currentTokens);
+
+  }
+  else if($_POST['func'] == "displayLeaderboard"){
+    $sql = "SELECT Username, total_tokens FROM users ORDER BY total_tokens DESC";
+    $conn = dbConnect();
+    $sanitized_sql = mysqli_real_escape_string($conn, $sql);
+    $result = mysqli_query($conn, $sql);
+    $arr = generateEventArray($result);
+    $html = generateLeaderboardHTML($arr);
+    echo $html;
 
   }
   else if($_POST['func'] == "purchasePromo"){
@@ -198,8 +209,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     else{
       echo "<center>This Promo does not exist</center>";
       //TODO: Figure out a better way to handle this
-
-      //$cost = 3000000;
     }
 
     $sql = "SELECT * FROM userpromos WHERE User_ID=".$id." AND Promo_ID=".$promo_id;
@@ -297,7 +306,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
           }
         }
       }
-
       //TODO: test if no rows are seen
       echo json_encode($arr);
     }

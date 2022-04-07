@@ -34,7 +34,7 @@ if($id != $_SESSION['id']){
    <header>
      <h1>Kato Rewards</h1>
      <button id="logout" style='background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);' ><a style='text-decoration:none; color:black;' href="logout.php">Logout</a></button>
-     <div><span id='tokens'>Tokens: <?php echo $_SESSION['tokens']; ?></span><span id='totalTokens'> Lifetime Tokens: <?php echo $_SESSION['total_tokens'];?></span></div>
+     <div><span id='tokens'>Tokens: <?php echo $_SESSION['tokens']; ?></span><span id='totalTokens'> Lifetime Tokens: <?php echo $_SESSION['totalTokens'];?></span></div>
      <div><span id='tokens'>User: <?php echo $_SESSION['userName']; ?></span></div>
    </header>
    <nav>

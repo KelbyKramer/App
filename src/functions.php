@@ -264,7 +264,7 @@ function login($username, $password){
       session_start();
       $_SESSION['id'] = $id;
       $_SESSION['tokens'] = $tokens;
-      $_SESSION['total_tokens'] = $totalTokens;
+      $_SESSION['totalTokens'] = $totalTokens;
       $_SESSION['userName'] = $userName;
       //echo $_SESSION['id'];
       header("location: dashboard.php?id=".$id);
@@ -354,6 +354,23 @@ function convertAddressToLink($address){
   $ret = str_replace(' ', '+', $address);
   return $ret;
 }
+
+function generateLeaderboardHTML($arr){
+  $ret = "";
+  session_start();
+  foreach($arr as $item){
+    if($item['Username'] == $_SESSION['userName']){
+      $ret .= "<div class='leaderboardEntry' style='color: red;'>";
+    }
+    else{
+      $ret .= "<div class='leaderboardEntry'>";
+    }
+    $ret .= "<span>".$item['Username']."</span>";
+    $ret .= "<span style='float: right;'>".$item['total_tokens']."</span>";
+    $ret .= "</div>";
+  }
+  return $ret;
+}
 //TODO: Test this function
 function generateHTML($arr){
   $ret = "";
@@ -383,6 +400,7 @@ function generateHTML($arr){
   }
   return $ret;
 }
+
 //TODO: Test this function
 function generateEventArray($result){
   $ret = array();

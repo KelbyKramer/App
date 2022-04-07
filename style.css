@@ -277,4 +277,15 @@ li a:hover {
   a#forgotPassword{
 
   }
+  .leaderboardEntry{
+    border: 2px solid black;
+    width: 100%;
+    font-size: 2rem;
+    display: grid;
+    grid-template-columns: 10fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas:
+      "span" "span"
+
+  }
 /*}*/

@@ -102,6 +102,21 @@ function closeEvent(){
 }
 
 function displayLeaderboard(){
+
+  $.ajax({
+  url: "src/ajax.php",
+  type: "POST",
+  data: {
+    func: "displayLeaderboard"
+  },
+  success: function(data){
+    console.log(data);
+    $('#scrollbox').html(
+        data
+    );
+  }
+});
+
   $('#scrollbox').html(
       $('<div>').prop({
           id: 'innerdiv',
@@ -154,10 +169,11 @@ function ajax(event_id){
         }
         colorEvents();
         //update the token and session token values
-        updateTokenCountsEvent();
+
         //TODO: get this done
       }
       });
+      updateTokenCountsEvent();
    }
    else{
      console.log("Not accepted yet");
@@ -174,7 +190,7 @@ function updateTokenCountsRedeem(){
   },
   success: function(data){
     console.log(data);
-    $('#tokens').html("Tokens: " + data);
+    $('#tokens').html("Tokens: " + data + " ");
   }
   });
 }
@@ -188,14 +204,19 @@ function updateTokenCountsEvent(){
   },
   success: function(data){
     console.log(data);
+    var parsedValues = JSON.parse(data);
+    console.log(parsedValues);
+    $('#tokens').html("Tokens: " + parsedValues[0]);
+    $('#totalTokens').html("Lifetime Tokens: " + parsedValues[1]);
   }
   });
+
 }
 
 function getGeoLocation(){
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);
-
+/*
     navigator.geolocation.watchPosition(function(position) {
       console.log("i'm tracking you!");
     },
@@ -206,7 +227,7 @@ function getGeoLocation(){
         navigator.geolocation.getCurrentPosition(showPosition);
       }
 
-    });
+    });*/
   } else {
     console.log("Geolocation is not supported by this browser.");
   }
@@ -216,7 +237,7 @@ function showPosition(position) {
 
   var coords = "<p id='coords'>" + position.coords.latitude + " " + position.coords.longitude + "</p>";
   $("body").append(coords);
-  queryLocPerms();
+  //queryLocPerms();
 }
 
 function displayEventMessage(message){
