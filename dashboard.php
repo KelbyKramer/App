@@ -32,7 +32,8 @@ if($id != $_SESSION['id']){
 </head>
  <body>
    <header>
-     <h1>Kato Rewards</h1>
+     <h1><span>Kato Rewards </span><span class='learnMore' id='learnMore'>?</span></h1>
+     <div id='info' class='hide'>Here is the info for how to use KatoRewards</div>
      <button id="logout" style='background-image: linear-gradient(315deg, #2a2a72 0%, #009ffd 74%);' ><a style='text-decoration:none; color:black;' href="logout.php">Logout</a></button>
      <div><span id='tokens'>Tokens: <?php echo $_SESSION['tokens']; ?></span><span id='totalTokens'> Lifetime Tokens: <?php echo $_SESSION['totalTokens'];?></span></div>
      <div><span id='tokens'>User: <?php echo $_SESSION['userName']; ?></span></div>
@@ -49,6 +50,7 @@ if($id != $_SESSION['id']){
     </ul>
    </nav>
 
+
    <main>
      <div id='confirmationForm' class='formAttributes hideform'>
     	<div>Are you sure you want to purchase this promo?</div>
@@ -57,20 +59,14 @@ if($id != $_SESSION['id']){
         <button id='close' style='float: right; color: green;'>No</button>
     </div>
 
-    <div id='eventMessage' class='formAttributes hideform'>
+    <div id='eventMessage' class='formAttributes hideform'></div>
 
-
-    </div>
-
-    <div id='redeemForm' class='formAttributes hideform'>
-      <div>This is a test div</div>
-   </div>
+    <div id='redeemForm' class='formAttributes hideform'></div>
    <!--
      <select class="div-toggle" data-target=".target">
        <option value="orange" data-show=".Athletic">Athletic Events</option>
        <option value="lemon" data-show=".nonAthletic">Non Athletic Events</option>
      </select>-->
-     <div style='color:black;' id='hello'></div>
 
      <div class='target' id="scrollbox">
      </div>
@@ -80,8 +76,13 @@ if($id != $_SESSION['id']){
 
 <script>
 
+$('#learnMore').on('click', function () {
+    $('#info').toggle();
+})
 $( document ).ready(function() {
-    displayHome();
+  $('#nav').slideDown(1000);
+  $('#scrollbox').slideDown(700);
+  displayHome();
 });
 
 $('#close').on('click', function () {

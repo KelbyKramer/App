@@ -94,16 +94,16 @@ if(isset($_POST) && count($_POST) > 0){
  </head>
 
 <body class='createAccount'>
-  <button id='back'><a style='text-decoration: none;' href='index.php'>Return to Login Screen</a></button>
+  <button id='back' style='float: center;'><a style='text-decoration: none; color:white;' href='index.php'>Return to Login Screen</a></button>
   <form method='post' action=''>
     <input id="field" name='userName' type="text" placeholder='Username' autocomplete='off'/>
     <input id="email" name='email' type="text" placeholder='E-mail (Use your @mnsu.edu email)' autocomplete='off'/>
     <input id="password" name='password' type="password" placeholder='Password (Must be at least 6 characters)' autocomplete='off'/>
     <input id="re-password" name='re-password' type="password" placeholder='Re-Enter Password' autocomplete='off'/>
-    <button type='button' id="expand" onclick="showExtraFields();">Want 100 free tokens?  Click here to provide more information</button>
-    <input style='display:none;' id="age" name='age' type="text" placeholder='Age (Optional)' autocomplete='off'/>
-    <input style='display:none;' id="major" name='major' type="text" placeholder='Current Major (Optional)' autocomplete='off'/>
-    <input style='display:none;' id="living" name='living' type="text" placeholder='Living Accomodations (Optional)' autocomplete='off'/>
+    <div id="expand" onclick="">Enter additional information to receive 100 tokens</div>
+    <input id="age" name='age' type="text" placeholder='Age (Optional)' autocomplete='off'/>
+    <input id="major" name='major' type="text" placeholder='Current Major (Optional)' autocomplete='off'/>
+    <input id="living" name='living' type="text" placeholder='Living Accomodations (Optional)' autocomplete='off'/>
     <div class="elem-group">
       <img src="captcha.php" alt="CAPTCHA" class="captcha-image"><i class="fas fa-redo refresh-captcha"></i>
       <br>

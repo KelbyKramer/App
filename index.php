@@ -69,7 +69,7 @@ var_dump($result);*/
    </div>
 
  </center>
-   <form method='post' action=''>
+   <form id='loginForm' method='post' action=''>
     <input id="field" name='userName' type="text" placeholder='Username' autocomplete='off'/>
     <input id="password" name='password' type="password" placeholder='Password' autocomplete='off'/>
     <div class="elem-group">
@@ -79,9 +79,10 @@ var_dump($result);*/
     </div>
     <button type="submit" id="submit">Login</button>
   </form>
-  <div>
-    <a href='createAccount.php'>Create Account</a>
-    <a href='forgotPassword.php'>Forgot Password</a>
+  <div id='links'>
+    <a class='link' href='createAccount.php'>Create Account</a>
+    <a class='link' href='forgotPassword.php'>Forgot Password</a>
+    <a class='link' href='contact.php'>Contact Us</a>
   </div>
  </body>
 </html>
