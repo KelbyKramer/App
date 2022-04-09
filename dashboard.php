@@ -1,4 +1,5 @@
 <?php
+//comment
 include("src/functions.php");
 include("header.php");
 
